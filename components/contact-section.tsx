@@ -72,7 +72,7 @@ const locations = [
 const iconAnimations = {
   pulse: {
     scale: [1, 1.1, 1],
-    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+    transition: { duration: 2, repeat: Infinity, ease: "easeInOut" as const },
   },
   shake: {
     rotate: [0, -10, 10, -10, 10, 0],
@@ -84,7 +84,7 @@ const iconAnimations = {
   },
   rotate: {
     rotate: [0, 360],
-    transition: { duration: 20, repeat: Infinity, ease: "linear" },
+    transition: { duration: 20, repeat: Infinity, ease: "linear" as const },
   },
 };
 
