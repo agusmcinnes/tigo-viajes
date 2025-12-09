@@ -75,7 +75,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display text-white mb-6 leading-tight"
+            className="text-5xl lg:text-6xl xl:text-7xl font-display text-white mb-6 leading-tight"
           >
             <span className="block">
               Tus vacaciones{" "}
@@ -92,7 +92,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed"
+            className="text-base md:text-lg lg:text-xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed"
           >
             Somos una empresa de viajes y turismo dedicada a crear experiencias
             inolvidables. Salidas grupales acompañadas nacionales e
