@@ -2,35 +2,111 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Sun, Umbrella, Waves, ArrowRight, Sparkles } from "lucide-react";
+import {
+  Sun,
+  Umbrella,
+  Waves,
+  ArrowRight,
+  Sparkles,
+  Palmtree,
+  Plane,
+  Hotel,
+  MapPin,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+  LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const summerFeatures = [
+// Mapa de iconos disponibles
+const iconMap: Record<string, LucideIcon> = {
+  Sun,
+  Umbrella,
+  Waves,
+  Sparkles,
+  Palmtree,
+  Plane,
+  Hotel,
+  MapPin,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+};
+
+interface Feature {
+  icon_name: string;
+  title: string;
+  description: string;
+}
+
+interface SpecialSectionData {
+  slug: string;
+  title: string;
+  subtitle?: string | null;
+  badge_text?: string | null;
+  background_image_url?: string | null;
+  cta_text?: string | null;
+}
+
+interface SpecialSectionProps {
+  section?: SpecialSectionData | null;
+  features?: Feature[];
+}
+
+// Datos por defecto
+const defaultSection: SpecialSectionData = {
+  slug: "verano-2026",
+  title: "Verano 2026",
+  subtitle:
+    "Reservá ahora y asegurate los mejores precios para las vacaciones de verano. Cupos limitados en salidas grupales.",
+  badge_text: "Ofertas Especiales",
+  background_image_url: "/verano2026-tigo.jpg",
+  cta_text: "Ver Ofertas de Verano",
+};
+
+const defaultFeatures: Feature[] = [
   {
-    icon: Sun,
+    icon_name: "Sun",
     title: "Destinos de Playa",
     description: "Brasil, Caribe, Costa Argentina",
   },
   {
-    icon: Umbrella,
+    icon_name: "Umbrella",
     title: "All Inclusive",
     description: "Todo incluido sin preocupaciones",
   },
   {
-    icon: Waves,
+    icon_name: "Waves",
     title: "Salidas Grupales",
     description: "Viajá acompañado y conocé gente",
   },
 ];
 
-export function SpecialSection() {
+export function SpecialSection({ section, features }: SpecialSectionProps) {
+  const sectionData = section || defaultSection;
+  const featuresData = features && features.length > 0 ? features : defaultFeatures;
+
+  const backgroundImage =
+    sectionData.background_image_url || "/verano2026-tigo.jpg";
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/verano2026-tigo.jpg')",
+          backgroundImage: `url('${backgroundImage}')`,
         }}
       >
         {/* Dark Overlay */}
@@ -50,7 +126,7 @@ export function SpecialSection() {
           >
             <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-medium border border-white/30">
               <Sparkles className="w-4 h-4" />
-              Ofertas Especiales
+              {sectionData.badge_text || "Ofertas Especiales"}
             </span>
           </motion.div>
 
@@ -62,20 +138,21 @@ export function SpecialSection() {
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl lg:text-6xl font-display text-white mb-6"
           >
-            Verano 2026
+            {sectionData.title}
           </motion.h2>
 
           {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-xl text-white/90 mb-10 max-w-2xl mx-auto"
-          >
-            Reservá ahora y asegurate los mejores precios para las vacaciones de
-            verano. Cupos limitados en salidas grupales.
-          </motion.p>
+          {sectionData.subtitle && (
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-xl text-white/90 mb-10 max-w-2xl mx-auto"
+            >
+              {sectionData.subtitle}
+            </motion.p>
+          )}
 
           {/* Features */}
           <motion.div
@@ -85,24 +162,27 @@ export function SpecialSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid sm:grid-cols-3 gap-6 mb-10"
           >
-            {summerFeatures.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
-              >
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-1">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-white/80">{feature.description}</p>
-              </motion.div>
-            ))}
+            {featuresData.map((feature, index) => {
+              const IconComponent = iconMap[feature.icon_name] || Star;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
+                >
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-white/80">{feature.description}</p>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {/* CTA Button */}
@@ -117,8 +197,11 @@ export function SpecialSection() {
               size="lg"
               className="bg-white text-secondary hover:bg-white/90 text-lg px-8 py-6 rounded-full shadow-xl"
             >
-              <Link href="/verano-2026" className="flex items-center gap-2">
-                Ver Ofertas de Verano
+              <Link
+                href={`/${sectionData.slug}`}
+                className="flex items-center gap-2"
+              >
+                {sectionData.cta_text || "Ver Ofertas"}
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </Button>

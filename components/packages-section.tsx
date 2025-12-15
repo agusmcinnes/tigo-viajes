@@ -4,13 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PackageCard } from "@/components/package-card";
-import { allPackages } from "@/lib/packages-data";
+import { PackageCard, TravelPackage } from "@/components/package-card";
 
-// Mostrar los primeros 6 paquetes en la página principal
-const featuredPackages = allPackages.slice(0, 6);
+interface PackagesSectionProps {
+  packages?: TravelPackage[];
+}
 
-export function PackagesSection() {
+export function PackagesSection({ packages = [] }: PackagesSectionProps) {
+  const featuredPackages = packages.slice(0, 6);
   return (
     <section id="destinos" className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
