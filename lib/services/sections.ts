@@ -3,6 +3,7 @@ import type {
   SpecialSection,
   SpecialSectionFeature,
   SpecialSectionFull,
+  Package,
   InsertTables,
   UpdateTables,
 } from "@/lib/types/database";
@@ -22,7 +23,7 @@ export async function getSections(): Promise<SpecialSection[]> {
     .order("display_order", { ascending: true });
 
   if (error) throw error;
-  return data || [];
+  return (data || []) as SpecialSection[];
 }
 
 export async function getSectionBySlug(
@@ -40,25 +41,27 @@ export async function getSectionBySlug(
 
   if (error || !section) return null;
 
+  const sectionData = section as SpecialSection;
+
   // Obtener features
   const { data: features } = await supabase
     .from("special_section_features")
     .select("*")
-    .eq("section_id", section.id)
+    .eq("section_id", sectionData.id)
     .order("display_order", { ascending: true });
 
   // Obtener paquetes de esta sección
   const { data: packages } = await supabase
     .from("packages")
     .select("*")
-    .eq("special_section_id", section.id)
+    .eq("special_section_id", sectionData.id)
     .eq("is_active", true)
     .order("is_featured", { ascending: false });
 
   return {
-    ...section,
-    features: features || [],
-    packages: packages || [],
+    ...sectionData,
+    features: (features || []) as SpecialSectionFeature[],
+    packages: (packages || []) as Package[],
   };
 }
 
@@ -76,25 +79,27 @@ export async function getActiveSection(): Promise<SpecialSectionFull | null> {
 
   if (error || !section) return null;
 
+  const sectionData = section as SpecialSection;
+
   // Obtener features
   const { data: features } = await supabase
     .from("special_section_features")
     .select("*")
-    .eq("section_id", section.id)
+    .eq("section_id", sectionData.id)
     .order("display_order", { ascending: true });
 
   // Obtener paquetes de esta sección
   const { data: packages } = await supabase
     .from("packages")
     .select("*")
-    .eq("special_section_id", section.id)
+    .eq("special_section_id", sectionData.id)
     .eq("is_active", true)
     .order("is_featured", { ascending: false });
 
   return {
-    ...section,
-    features: features || [],
-    packages: packages || [],
+    ...sectionData,
+    features: (features || []) as SpecialSectionFeature[],
+    packages: (packages || []) as Package[],
   };
 }
 
@@ -112,9 +117,11 @@ export async function getSectionsAdmin(): Promise<SpecialSectionFull[]> {
 
   if (error) throw error;
 
+  const sectionsList = (sections || []) as SpecialSection[];
+
   // Obtener features y paquetes para cada sección
   const sectionsWithData = await Promise.all(
-    (sections || []).map(async (section) => {
+    sectionsList.map(async (section) => {
       const { data: features } = await supabase
         .from("special_section_features")
         .select("*")
@@ -128,8 +135,8 @@ export async function getSectionsAdmin(): Promise<SpecialSectionFull[]> {
 
       return {
         ...section,
-        features: features || [],
-        packages: packages || [],
+        features: (features || []) as SpecialSectionFeature[],
+        packages: (packages || []) as Package[],
       };
     })
   );
@@ -150,21 +157,23 @@ export async function getSectionAdminById(
 
   if (error || !section) return null;
 
+  const sectionData = section as SpecialSection;
+
   const { data: features } = await supabase
     .from("special_section_features")
     .select("*")
-    .eq("section_id", section.id)
+    .eq("section_id", sectionData.id)
     .order("display_order", { ascending: true });
 
   const { data: packages } = await supabase
     .from("packages")
     .select("*")
-    .eq("special_section_id", section.id);
+    .eq("special_section_id", sectionData.id);
 
   return {
-    ...section,
-    features: features || [],
-    packages: packages || [],
+    ...sectionData,
+    features: (features || []) as SpecialSectionFeature[],
+    packages: (packages || []) as Package[],
   };
 }
 
@@ -175,12 +184,12 @@ export async function createSection(
 
   const { data: section, error } = await supabase
     .from("special_sections")
-    .insert(data)
+    .insert(data as never)
     .select()
     .single();
 
   if (error) throw error;
-  return section;
+  return section as SpecialSection;
 }
 
 export async function updateSection(
@@ -191,13 +200,13 @@ export async function updateSection(
 
   const { data: section, error } = await supabase
     .from("special_sections")
-    .update(data)
+    .update(data as never)
     .eq("id", id)
     .select()
     .single();
 
   if (error) throw error;
-  return section;
+  return section as SpecialSection;
 }
 
 export async function deleteSection(id: string): Promise<void> {
@@ -206,7 +215,7 @@ export async function deleteSection(id: string): Promise<void> {
   // Primero quitar la referencia de los paquetes
   await supabase
     .from("packages")
-    .update({ special_section_id: null, is_special: false })
+    .update({ special_section_id: null, is_special: false } as never)
     .eq("special_section_id", id);
 
   // Luego eliminar la sección (los features se eliminan en cascada)
@@ -226,7 +235,7 @@ export async function toggleSectionActive(
 
   const { error } = await supabase
     .from("special_sections")
-    .update({ is_active: isActive })
+    .update({ is_active: isActive } as never)
     .eq("id", id);
 
   if (error) throw error;
@@ -243,12 +252,12 @@ export async function addFeature(
 
   const { data: feature, error } = await supabase
     .from("special_section_features")
-    .insert(data)
+    .insert(data as never)
     .select()
     .single();
 
   if (error) throw error;
-  return feature;
+  return feature as SpecialSectionFeature;
 }
 
 export async function updateFeature(
@@ -259,7 +268,7 @@ export async function updateFeature(
 
   const { error } = await supabase
     .from("special_section_features")
-    .update(data)
+    .update(data as never)
     .eq("id", id);
 
   if (error) throw error;
@@ -295,7 +304,7 @@ export async function updateFeatures(
         ...f,
         section_id: sectionId,
         display_order: index,
-      }))
+      })) as never
     );
 
     if (error) throw error;
@@ -315,14 +324,14 @@ export async function assignPackagesToSection(
   // Quitar todos los paquetes de esta sección
   await supabase
     .from("packages")
-    .update({ special_section_id: null, is_special: false })
+    .update({ special_section_id: null, is_special: false } as never)
     .eq("special_section_id", sectionId);
 
   // Asignar los paquetes seleccionados
   if (packageIds.length > 0) {
     const { error } = await supabase
       .from("packages")
-      .update({ special_section_id: sectionId, is_special: true })
+      .update({ special_section_id: sectionId, is_special: true } as never)
       .in("id", packageIds);
 
     if (error) throw error;

@@ -46,7 +46,22 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6...
 
 ---
 
-## Paso 5: Cargar los Datos Iniciales
+## Paso 5: Configurar Storage para Imagenes
+
+1. En SQL Editor, crear una nueva query
+2. Abrir el archivo `supabase/migrations/002_storage.sql`
+3. Copiar TODO el contenido y pegarlo
+4. Click en "Run"
+5. Verificar en **Storage** que se crearon los buckets:
+   - `packages` - Para imagenes de paquetes
+   - `sections` - Para imagenes de secciones
+   - `destinations` - Para imagenes de destinos
+
+> **Nota**: Los buckets son publicos para lectura. Solo usuarios autenticados pueden subir imagenes desde el panel admin.
+
+---
+
+## Paso 6: Cargar los Datos Iniciales
 
 1. En SQL Editor, crear una nueva query
 2. Abrir el archivo `supabase/seed.sql`
@@ -56,7 +71,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6...
 
 ---
 
-## Paso 6: Crear Usuario Administrador
+## Paso 7: Crear Usuario Administrador
 
 1. En Supabase, ir a **Authentication** → **Users**
 2. Click en "Add User" → "Create new user"
@@ -68,7 +83,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6...
 
 ---
 
-## Paso 7: Probar el Panel de Administracion
+## Paso 8: Probar el Panel de Administracion
 
 1. Iniciar el servidor de desarrollo:
 ```bash
@@ -107,7 +122,7 @@ npm run dev
 - Nombre, descripcion corta y larga
 - Destino y duracion (dias/noches)
 - Precio base y moneda (ARS/USD)
-- Imagen principal (URL)
+- Imagen principal (subir archivo o arrastrar)
 - Servicios incluidos (lista editable)
 - Servicios NO incluidos (lista editable)
 - Excursiones opcionales (lista editable)
@@ -117,7 +132,7 @@ npm run dev
 ### Secciones Especiales
 - Titulo y subtitulo
 - Texto del badge (ej: "Ofertas Especiales")
-- Imagen de fondo
+- Imagen de fondo (subir archivo o arrastrar)
 - Banner promocional (titulo + descripcion)
 - Hasta 4 features con icono, titulo y descripcion
 - Asignar paquetes a la seccion
@@ -132,8 +147,9 @@ npm run dev
 ## Notas Importantes
 
 - **Sin Supabase**: El sitio funciona con datos mock si no configuras Supabase
-- **Imagenes**: Usa URLs de imagenes externas (Unsplash, tu hosting, etc.)
-- **Iconos**: Los features usan iconos de Lucide React (Sun, Umbrella, Waves, etc.)
+- **Imagenes**: Podes subir imagenes directamente desde el admin (JPG, PNG, WebP - max 5MB)
+- **Storage**: Las imagenes se guardan en Supabase Storage con acceso publico
+- **Iconos**: Los features usan iconos de Lucide React (Sun, Umbrella, Waves, Bus, Users, etc.)
 - **Precios**: Se muestran como string para flexibilidad (ej: "USD 1.200", "ARS 450.000")
 
 ---

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type {
   Package,
   PackageWithDepartures,
+  PackageDepartureDate,
   TravelPackageDisplay,
   InsertTables,
   UpdateTables,
@@ -74,9 +75,11 @@ export async function getPackages(): Promise<TravelPackageDisplay[]> {
 
   if (error) throw error;
 
+  const pkgList = (packages || []) as Package[];
+
   // Obtener fechas de salida para cada paquete
   const packagesWithDates = await Promise.all(
-    (packages || []).map(async (pkg) => {
+    pkgList.map(async (pkg) => {
       const { data: dates } = await supabase
         .from("package_departure_dates")
         .select("departure_date, price, currency")
@@ -84,12 +87,14 @@ export async function getPackages(): Promise<TravelPackageDisplay[]> {
         .eq("is_active", true)
         .order("departure_date", { ascending: true });
 
-      return toDisplayFormat(pkg, dates || []);
+      return toDisplayFormat(pkg, (dates || []) as { departure_date: string; price: number; currency: string }[]);
     })
   );
 
   return packagesWithDates;
 }
+
+type DepartureDateResult = { departure_date: string; price: number; currency: string };
 
 export async function getPackageById(
   id: string
@@ -105,14 +110,16 @@ export async function getPackageById(
 
   if (error || !pkg) return null;
 
+  const pkgData = pkg as Package;
+
   const { data: dates } = await supabase
     .from("package_departure_dates")
     .select("departure_date, price, currency")
-    .eq("package_id", pkg.id)
+    .eq("package_id", pkgData.id)
     .eq("is_active", true)
     .order("departure_date", { ascending: true });
 
-  return toDisplayFormat(pkg, dates || []);
+  return toDisplayFormat(pkgData, (dates || []) as DepartureDateResult[]);
 }
 
 export async function getPackageBySlug(
@@ -129,14 +136,16 @@ export async function getPackageBySlug(
 
   if (error || !pkg) return null;
 
+  const pkgData = pkg as Package;
+
   const { data: dates } = await supabase
     .from("package_departure_dates")
     .select("departure_date, price, currency")
-    .eq("package_id", pkg.id)
+    .eq("package_id", pkgData.id)
     .eq("is_active", true)
     .order("departure_date", { ascending: true });
 
-  return toDisplayFormat(pkg, dates || []);
+  return toDisplayFormat(pkgData, (dates || []) as DepartureDateResult[]);
 }
 
 export async function getFeaturedPackages(): Promise<TravelPackageDisplay[]> {
@@ -147,13 +156,15 @@ export async function getFeaturedPackages(): Promise<TravelPackageDisplay[]> {
     .select("*")
     .eq("is_active", true)
     .eq("is_featured", true)
-    .eq("is_special", false)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(6);
 
   if (error) throw error;
 
+  const pkgList = (packages || []) as Package[];
+
   const packagesWithDates = await Promise.all(
-    (packages || []).map(async (pkg) => {
+    pkgList.map(async (pkg) => {
       const { data: dates } = await supabase
         .from("package_departure_dates")
         .select("departure_date, price, currency")
@@ -162,7 +173,7 @@ export async function getFeaturedPackages(): Promise<TravelPackageDisplay[]> {
         .order("departure_date", { ascending: true })
         .limit(4);
 
-      return toDisplayFormat(pkg, dates || []);
+      return toDisplayFormat(pkg, (dates || []) as DepartureDateResult[]);
     })
   );
 
@@ -183,8 +194,10 @@ export async function getPackagesByDestination(
 
   if (error) throw error;
 
+  const pkgList = (packages || []) as Package[];
+
   const packagesWithDates = await Promise.all(
-    (packages || []).map(async (pkg) => {
+    pkgList.map(async (pkg) => {
       const { data: dates } = await supabase
         .from("package_departure_dates")
         .select("departure_date, price, currency")
@@ -193,7 +206,7 @@ export async function getPackagesByDestination(
         .order("departure_date", { ascending: true })
         .limit(4);
 
-      return toDisplayFormat(pkg, dates || []);
+      return toDisplayFormat(pkg, (dates || []) as DepartureDateResult[]);
     })
   );
 
@@ -214,17 +227,21 @@ export async function getSpecialPackages(
 
   if (!section) return [];
 
+  const sectionData = section as { id: string };
+
   const { data: packages, error } = await supabase
     .from("packages")
     .select("*")
     .eq("is_active", true)
-    .eq("special_section_id", section.id)
+    .eq("special_section_id", sectionData.id)
     .order("is_featured", { ascending: false });
 
   if (error) throw error;
 
+  const pkgList = (packages || []) as Package[];
+
   const packagesWithDates = await Promise.all(
-    (packages || []).map(async (pkg) => {
+    pkgList.map(async (pkg) => {
       const { data: dates } = await supabase
         .from("package_departure_dates")
         .select("departure_date, price, currency")
@@ -233,7 +250,7 @@ export async function getSpecialPackages(
         .order("departure_date", { ascending: true })
         .limit(4);
 
-      return toDisplayFormat(pkg, dates || []);
+      return toDisplayFormat(pkg, (dates || []) as DepartureDateResult[]);
     })
   );
 
@@ -256,12 +273,14 @@ export async function getRelatedPackages(
     .neq("slug", currentSlug)
     .limit(limit);
 
-  if (sameDestination && sameDestination.length >= limit) {
-    return sameDestination.map((pkg) => toDisplayFormat(pkg));
+  const sameDestList = (sameDestination || []) as Package[];
+
+  if (sameDestList.length >= limit) {
+    return sameDestList.map((pkg) => toDisplayFormat(pkg));
   }
 
   // Si no hay suficientes, completar con otros
-  const remaining = limit - (sameDestination?.length || 0);
+  const remaining = limit - sameDestList.length;
   const { data: others } = await supabase
     .from("packages")
     .select("*")
@@ -271,7 +290,8 @@ export async function getRelatedPackages(
     .eq("is_featured", true)
     .limit(remaining);
 
-  const all = [...(sameDestination || []), ...(others || [])];
+  const othersList = (others || []) as Package[];
+  const all = [...sameDestList, ...othersList];
   return all.map((pkg) => toDisplayFormat(pkg));
 }
 
@@ -289,8 +309,10 @@ export async function getPackagesAdmin(): Promise<PackageWithDepartures[]> {
 
   if (error) throw error;
 
+  const pkgList = (packages || []) as Package[];
+
   const packagesWithDates = await Promise.all(
-    (packages || []).map(async (pkg) => {
+    pkgList.map(async (pkg) => {
       const { data: dates } = await supabase
         .from("package_departure_dates")
         .select("*")
@@ -299,8 +321,8 @@ export async function getPackagesAdmin(): Promise<PackageWithDepartures[]> {
 
       return {
         ...pkg,
-        departure_dates: dates || [],
-      };
+        departure_dates: (dates || []) as PackageDepartureDate[],
+      } as PackageWithDepartures;
     })
   );
 
@@ -320,15 +342,17 @@ export async function getPackageAdminById(
 
   if (error || !pkg) return null;
 
+  const pkgData = pkg as Package;
+
   const { data: dates } = await supabase
     .from("package_departure_dates")
     .select("*")
-    .eq("package_id", pkg.id)
+    .eq("package_id", pkgData.id)
     .order("departure_date", { ascending: true });
 
   return {
-    ...pkg,
-    departure_dates: dates || [],
+    ...pkgData,
+    departure_dates: (dates || []) as PackageDepartureDate[],
   };
 }
 
@@ -339,12 +363,12 @@ export async function createPackage(
 
   const { data: pkg, error } = await supabase
     .from("packages")
-    .insert(data)
+    .insert(data as never)
     .select()
     .single();
 
   if (error) throw error;
-  return pkg;
+  return pkg as Package;
 }
 
 export async function updatePackage(
@@ -355,13 +379,13 @@ export async function updatePackage(
 
   const { data: pkg, error } = await supabase
     .from("packages")
-    .update(data)
+    .update(data as never)
     .eq("id", id)
     .select()
     .single();
 
   if (error) throw error;
-  return pkg;
+  return pkg as Package;
 }
 
 export async function deletePackage(id: string): Promise<void> {
@@ -380,7 +404,7 @@ export async function togglePackageActive(
 
   const { error } = await supabase
     .from("packages")
-    .update({ is_active: isActive })
+    .update({ is_active: isActive } as never)
     .eq("id", id);
 
   if (error) throw error;
@@ -397,7 +421,7 @@ export async function addDepartureDate(
 
   const { data: date, error } = await supabase
     .from("package_departure_dates")
-    .insert(data)
+    .insert(data as never)
     .select()
     .single();
 
@@ -413,7 +437,7 @@ export async function updateDepartureDate(
 
   const { error } = await supabase
     .from("package_departure_dates")
-    .update(data)
+    .update(data as never)
     .eq("id", id);
 
   if (error) throw error;

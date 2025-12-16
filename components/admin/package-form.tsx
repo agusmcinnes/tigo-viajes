@@ -25,6 +25,7 @@ import {
   DollarSign,
   Trash2,
 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 interface PackageFormProps {
   package?: PackageWithDepartures;
@@ -168,7 +169,7 @@ export function PackageForm({
         // Update existing package
         const { error } = await supabase
           .from("packages")
-          .update(packageData)
+          .update(packageData as never)
           .eq("id", pkg.id);
 
         if (error) throw error;
@@ -197,14 +198,14 @@ export function PackageForm({
               departure_date: d.departure_date,
               price: d.price,
               currency: d.currency,
-            }))
+            })) as never
           );
         }
       } else {
         // Create new package
         const { data: newPkg, error } = await supabase
           .from("packages")
-          .insert(packageData)
+          .insert(packageData as never)
           .select()
           .single();
 
@@ -212,13 +213,14 @@ export function PackageForm({
 
         // Insert departure dates
         if (departureDates.length > 0 && newPkg) {
+          const newPkgData = newPkg as { id: string };
           await supabase.from("package_departure_dates").insert(
             departureDates.map((d) => ({
-              package_id: newPkg.id,
+              package_id: newPkgData.id,
               departure_date: d.departure_date,
               price: d.price,
               currency: d.currency,
-            }))
+            })) as never
           );
         }
       }
@@ -291,25 +293,13 @@ export function PackageForm({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="image_url">URL de Imagen *</Label>
-          <Input
-            id="image_url"
-            value={formData.image_url}
-            onChange={(e) =>
-              setFormData({ ...formData, image_url: e.target.value })
-            }
-            placeholder="https://..."
-            required
-          />
-          {formData.image_url && (
-            <img
-              src={formData.image_url}
-              alt="Preview"
-              className="mt-2 w-full max-w-md h-48 object-cover rounded-lg"
-            />
-          )}
-        </div>
+        <ImageUpload
+          bucket="packages"
+          currentUrl={formData.image_url}
+          onUpload={(url) => setFormData({ ...formData, image_url: url })}
+          label="Imagen del Paquete"
+          required
+        />
       </div>
 
       {/* Destination & Duration */}

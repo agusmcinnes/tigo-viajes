@@ -37,7 +37,7 @@ export function SectionActions({ sectionId, isActive }: SectionActionsProps) {
 
     await supabase
       .from("special_sections")
-      .update({ is_active: !isActive })
+      .update({ is_active: !isActive } as never)
       .eq("id", sectionId);
 
     router.refresh();
@@ -51,7 +51,7 @@ export function SectionActions({ sectionId, isActive }: SectionActionsProps) {
     // Quitar paquetes de esta sección
     await supabase
       .from("packages")
-      .update({ special_section_id: null, is_special: false })
+      .update({ special_section_id: null, is_special: false } as never)
       .eq("special_section_id", sectionId);
 
     // Eliminar sección

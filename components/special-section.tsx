@@ -20,6 +20,7 @@ import {
   Clock,
   Users,
   Check,
+  Bus,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ const iconMap: Record<string, LucideIcon> = {
   Clock,
   Users,
   Check,
+  Bus,
 };
 
 interface Feature {
@@ -69,27 +71,27 @@ const defaultSection: SpecialSectionData = {
   slug: "verano-2026",
   title: "Verano 2026",
   subtitle:
-    "Reservá ahora y asegurate los mejores precios para las vacaciones de verano. Cupos limitados en salidas grupales.",
-  badge_text: "Ofertas Especiales",
+    "Viajes en bus grupales con las mejores comodidades. Bus Mix de última generación, servicio a bordo y coordinador.",
+  badge_text: "Salidas Grupales",
   background_image_url: "/verano2026-tigo.jpg",
   cta_text: "Ver Ofertas de Verano",
 };
 
 const defaultFeatures: Feature[] = [
   {
-    icon_name: "Sun",
-    title: "Destinos de Playa",
-    description: "Brasil, Caribe, Costa Argentina",
+    icon_name: "Bus",
+    title: "Bus de Última Generación",
+    description: "Bus Mix con todas las comodidades",
   },
   {
-    icon_name: "Umbrella",
-    title: "All Inclusive",
-    description: "Todo incluido sin preocupaciones",
-  },
-  {
-    icon_name: "Waves",
-    title: "Salidas Grupales",
+    icon_name: "Users",
+    title: "Grupos de 40 personas",
     description: "Viajá acompañado y conocé gente",
+  },
+  {
+    icon_name: "Sparkles",
+    title: "Servicio a Bordo",
+    description: "Coordinador durante todo el viaje",
   },
 ];
 

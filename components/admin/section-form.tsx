@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Save, Loader2, Plus, X, GripVertical } from "lucide-react";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 // Iconos disponibles de Lucide
 const availableIcons = [
@@ -143,7 +144,7 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
         // Update existing section
         const { error } = await supabase
           .from("special_sections")
-          .update(formData)
+          .update(formData as never)
           .eq("id", section.id);
 
         if (error) throw error;
@@ -151,12 +152,13 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
         // Create new section
         const { data: newSection, error } = await supabase
           .from("special_sections")
-          .insert(formData)
+          .insert(formData as never)
           .select()
           .single();
 
         if (error) throw error;
-        sectionId = newSection.id;
+        const newSectionData = newSection as { id: string };
+        sectionId = newSectionData.id;
       }
 
       // Update features
@@ -178,7 +180,7 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
                 title: f.title,
                 description: f.description,
                 display_order: index,
-              }))
+              })) as never
             );
 
           if (featuresError) throw featuresError;
@@ -187,14 +189,14 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
         // Update packages - first remove all from this section
         await supabase
           .from("packages")
-          .update({ special_section_id: null, is_special: false })
+          .update({ special_section_id: null, is_special: false } as never)
           .eq("special_section_id", sectionId);
 
         // Then assign selected packages
         if (selectedPackages.length > 0) {
           const { error: pkgError } = await supabase
             .from("packages")
-            .update({ special_section_id: sectionId, is_special: true })
+            .update({ special_section_id: sectionId, is_special: true } as never)
             .in("id", selectedPackages);
 
           if (pkgError) throw pkgError;
@@ -280,24 +282,12 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="background_image_url">URL de Imagen de Fondo</Label>
-          <Input
-            id="background_image_url"
-            value={formData.background_image_url || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, background_image_url: e.target.value })
-            }
-            placeholder="https://..."
-          />
-          {formData.background_image_url && (
-            <img
-              src={formData.background_image_url}
-              alt="Preview"
-              className="mt-2 w-full max-w-md h-32 object-cover rounded-lg"
-            />
-          )}
-        </div>
+        <ImageUpload
+          bucket="sections"
+          currentUrl={formData.background_image_url || undefined}
+          onUpload={(url) => setFormData({ ...formData, background_image_url: url })}
+          label="Imagen de Fondo"
+        />
       </div>
 
       {/* Promo Banner */}

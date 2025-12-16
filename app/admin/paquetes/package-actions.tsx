@@ -37,7 +37,7 @@ export function PackageActions({ packageId, isActive }: PackageActionsProps) {
 
     await supabase
       .from("packages")
-      .update({ is_active: !isActive })
+      .update({ is_active: !isActive } as never)
       .eq("id", packageId);
 
     router.refresh();
@@ -57,13 +57,14 @@ export function PackageActions({ packageId, isActive }: PackageActionsProps) {
 
     if (pkg) {
       // Crear copia
-      const { id, created_at, updated_at, ...rest } = pkg;
+      const pkgData = pkg as Record<string, unknown>;
+      const { id, created_at, updated_at, ...rest } = pkgData;
       await supabase.from("packages").insert({
         ...rest,
-        name: `${pkg.name} (copia)`,
-        slug: `${pkg.slug}-copia-${Date.now()}`,
+        name: `${pkgData.name} (copia)`,
+        slug: `${pkgData.slug}-copia-${Date.now()}`,
         is_active: false,
-      });
+      } as never);
     }
 
     router.refresh();

@@ -61,12 +61,12 @@ export async function createDestination(
 
   const { data: destination, error } = await supabase
     .from("destinations")
-    .insert(data)
+    .insert(data as never)
     .select()
     .single();
 
   if (error) throw error;
-  return destination;
+  return destination as Destination;
 }
 
 export async function updateDestination(
@@ -77,13 +77,13 @@ export async function updateDestination(
 
   const { data: destination, error } = await supabase
     .from("destinations")
-    .update(data)
+    .update(data as never)
     .eq("id", id)
     .select()
     .single();
 
   if (error) throw error;
-  return destination;
+  return destination as Destination;
 }
 
 export async function deleteDestination(id: string): Promise<void> {
@@ -102,7 +102,7 @@ export async function toggleDestinationActive(
 
   const { error } = await supabase
     .from("destinations")
-    .update({ is_active: isActive })
+    .update({ is_active: isActive } as never)
     .eq("id", id);
 
   if (error) throw error;

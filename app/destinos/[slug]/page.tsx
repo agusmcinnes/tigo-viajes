@@ -21,14 +21,14 @@ const destinationsData: Record<
   argentina: {
     name: "Argentina",
     description:
-      "Descubrí la belleza de nuestro país. Desde las Cataratas del Iguazú hasta la Patagonia, viví experiencias únicas.",
+      "Descubrí la belleza de nuestro país. Desde las Cataratas del Iguazú hasta la Patagonia y las termas de Federación.",
     heroImage:
       "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?q=80&w=2070",
     highlights: [
       "Cataratas del Iguazú",
-      "Bariloche y la Patagonia",
-      "Mendoza y sus viñedos",
-      "Salta y el Norte Argentino",
+      "Glaciar Perito Moreno",
+      "Termas de Federación",
+      "Carnavales de Gualeguaychú",
     ],
   },
   brasil: {
@@ -37,41 +37,7 @@ const destinationsData: Record<
       "Playas paradisíacas, ritmo y alegría. Brasil te espera con sus mejores destinos de sol y playa.",
     heroImage:
       "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2070",
-    highlights: ["Río de Janeiro", "Florianópolis", "Buzios", "Camboriú"],
-  },
-  caribe: {
-    name: "Caribe",
-    description:
-      "Aguas turquesas, arenas blancas y resorts all inclusive. El paraíso existe y está en el Caribe.",
-    heroImage:
-      "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?q=80&w=2074",
-    highlights: ["Punta Cana", "Cancún", "Aruba", "Jamaica"],
-  },
-  europa: {
-    name: "Europa",
-    description:
-      "Historia, cultura y gastronomía. Recorré las capitales más emblemáticas del viejo continente.",
-    heroImage:
-      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020",
-    highlights: [
-      "Roma, París & Madrid",
-      "Londres & Amsterdam",
-      "Grecia & Turquía",
-      "Países Nórdicos",
-    ],
-  },
-  "estados-unidos": {
-    name: "Estados Unidos",
-    description:
-      "Desde los parques de Orlando hasta las luces de Nueva York. Viví el sueño americano.",
-    heroImage:
-      "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?q=80&w=2099",
-    highlights: [
-      "Nueva York",
-      "Miami",
-      "Orlando - Disney",
-      "Las Vegas & Los Angeles",
-    ],
+    highlights: ["Camboriú", "Florianópolis", "Río de Janeiro", "Buzios"],
   },
 };
 
