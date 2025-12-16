@@ -36,6 +36,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Tigo Viajes" }],
   creator: "Tigo Viajes",
+  icons: {
+    icon: "/LOGO TIGO VIOLETA.png",
+    apple: "/LOGO TIGO VIOLETA.png",
+  },
   openGraph: {
     type: "website",
     locale: "es_AR",
@@ -43,6 +47,7 @@ export const metadata: Metadata = {
     title: "Tigo Viajes - Tus vacaciones únicas",
     description:
       "Empresa de viajes y turismo desde 1977. Salidas grupales acompañadas y paquetes personalizados.",
+    images: ["/LOGO TIGO VIOLETA.png"],
   },
   twitter: {
     card: "summary_large_image",

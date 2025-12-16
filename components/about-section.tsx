@@ -14,7 +14,7 @@ const values = [
   {
     icon: Users,
     title: "Atención personalizada",
-    description: "Cada viaje es único, adaptado a tus necesidades y deseos.",
+    description: "Cada viaje es único, adaptado 100% a tus necesidades y deseos.",
   },
   {
     icon: Award,

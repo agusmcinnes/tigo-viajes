@@ -23,37 +23,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
-const destinations = [
+interface Destination {
+  name: string;
+  slug: string;
+  image: string;
+  description: string;
+}
+
+const fallbackDestinations: Destination[] = [
   {
     name: "Argentina",
     slug: "argentina",
     image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=400&q=80",
-    description: "Patagonia, Buenos Aires, Iguazú",
+    description: "Federación, Glaciares, Cataratas",
   },
   {
     name: "Brasil",
     slug: "brasil",
     image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=400&q=80",
-    description: "Río, Florianópolis, Búzios",
-  },
-  {
-    name: "Caribe",
-    slug: "caribe",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80",
-    description: "Punta Cana, Cancún, Aruba",
-  },
-  {
-    name: "Europa",
-    slug: "europa",
-    image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80",
-    description: "España, Italia, Francia",
-  },
-  {
-    name: "Estados Unidos",
-    slug: "estados-unidos",
-    image: "https://images.unsplash.com/photo-1534430480872-3498386e7856?w=400&q=80",
-    description: "Miami, Orlando, Nueva York",
+    description: "Camboriú, Florianópolis",
   },
 ];
 
@@ -72,6 +62,7 @@ interface HeaderProps {
 export function Header({ variant = "transparent" }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [destinations, setDestinations] = useState<Destination[]>(fallbackDestinations);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,6 +70,35 @@ export function Header({ variant = "transparent" }: HeaderProps) {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Cargar destinos desde Supabase
+  useEffect(() => {
+    async function loadDestinations() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("destinations")
+          .select("name, slug, image_url, description")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const destinationsData = data as { name: string; slug: string; image_url: string | null; description: string | null }[];
+          setDestinations(
+            destinationsData.map((d) => ({
+              name: d.name,
+              slug: d.slug,
+              image: d.image_url || fallbackDestinations.find(f => f.slug === d.slug)?.image || "",
+              description: d.description || "",
+            }))
+          );
+        }
+      } catch {
+        // Usar fallback en caso de error
+      }
+    }
+    loadDestinations();
   }, []);
 
   // Si variant es "solid", siempre mostrar como scrolled (fondo blanco)
@@ -146,8 +166,14 @@ export function Header({ variant = "transparent" }: HeaderProps) {
 
                     {/* Dropdown on hover */}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                      <div className="w-[500px] p-4 bg-white/95 backdrop-blur-xl border-0 shadow-2xl shadow-primary/10 rounded-2xl">
-                        <div className="grid grid-cols-2 gap-2">
+                      <div className={cn(
+                        "p-4 bg-white/95 backdrop-blur-xl border-0 shadow-2xl shadow-primary/10 rounded-2xl",
+                        destinations.length > 2 ? "w-[500px]" : "w-[400px]"
+                      )}>
+                        <div className={cn(
+                          "grid gap-2",
+                          destinations.length > 2 ? "grid-cols-2" : "grid-cols-1"
+                        )}>
                           {destinations.map((dest) => (
                             <Link
                               key={dest.slug}

@@ -6,9 +6,27 @@ import { Calendar, Users, Clock, MapPin, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TravelPackage } from "@/lib/packages-data";
 
-export type { TravelPackage };
+// Tipo unificado para paquetes (compatible con mock y Supabase)
+export interface TravelPackage {
+  id: string | number;
+  slug: string;
+  name: string;
+  description: string;
+  longDescription?: string;
+  destination: string;
+  destinationSlug: string;
+  price: string;
+  duration: string;
+  nights: number;
+  groupSize?: string;
+  dates?: string[];
+  imageUrl: string;
+  isGroupal?: boolean;
+  isFeatured?: boolean;
+  includedServices: string[];
+  additionalServices?: string[];
+}
 
 interface PackageCardProps {
   package: TravelPackage;
