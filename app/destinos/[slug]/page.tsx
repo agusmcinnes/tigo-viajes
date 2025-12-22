@@ -51,24 +51,25 @@ async function getDestinationData(slug: string) {
 
     const fallbackData = destinationsData[slug];
 
-    if (packages.length > 0) {
+    // Si el destino existe en Supabase, usarlo (tenga o no paquetes)
+    if (destination) {
       return {
         destination: {
-          name: destination?.name || fallbackData?.name || slug,
+          name: destination.name,
           description:
             fallbackData?.description ||
-            `Descubrí los mejores paquetes a ${destination?.name || slug}`,
+            `Descubrí los mejores paquetes a ${destination.name}`,
           heroImage:
-            destination?.image_url ||
+            destination.image_url ||
             fallbackData?.heroImage ||
-            packages[0]?.imageUrl,
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070",
           highlights: fallbackData?.highlights || [],
         },
         packages,
       };
     }
 
-    // Fallback a datos mock
+    // Fallback a datos mock si no existe en Supabase
     if (fallbackData) {
       const mockPackages = getPackagesByDestinationMock(slug);
       return {
@@ -79,7 +80,7 @@ async function getDestinationData(slug: string) {
 
     return { destination: null, packages: [] };
   } catch {
-    // Fallback a mock
+    // Fallback a mock en caso de error
     const fallbackData = destinationsData[slug];
     if (fallbackData) {
       const mockPackages = getPackagesByDestinationMock(slug);
