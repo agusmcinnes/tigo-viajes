@@ -79,18 +79,18 @@ export function Header({ variant = "transparent" }: HeaderProps) {
         const supabase = createClient();
         const { data, error } = await supabase
           .from("destinations")
-          .select("name, slug, image_url, description")
+          .select("name, slug, image_url")
           .eq("is_active", true)
           .order("display_order", { ascending: true });
 
         if (!error && data && data.length > 0) {
-          const destinationsData = data as { name: string; slug: string; image_url: string | null; description: string | null }[];
+          const destinationsData = data as { name: string; slug: string; image_url: string | null }[];
           setDestinations(
             destinationsData.map((d) => ({
               name: d.name,
               slug: d.slug,
-              image: d.image_url || fallbackDestinations.find(f => f.slug === d.slug)?.image || "",
-              description: d.description || "",
+              image: d.image_url || "",
+              description: "",
             }))
           );
         }
