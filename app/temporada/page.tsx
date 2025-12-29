@@ -1,16 +1,15 @@
-import { notFound } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { SpecialPageContent } from "./special-page-content";
-import { getSectionBySlug } from "@/lib/services/sections";
+import { getActiveSection } from "@/lib/services/sections";
 import { getSpecialPackages } from "@/lib/services/packages";
 import { TravelPackage } from "@/components/package-card";
 
 // Datos de respaldo hardcodeados
 const fallbackSection = {
-  slug: "verano-2026",
-  title: "Verano 2026",
+  slug: "temporada",
+  title: "Temporada Especial",
   subtitle: "Viajes en bus grupales con las mejores comodidades. Bus Mix de última generación, servicio a bordo y coordinador.",
   badge_text: "Salidas Grupales - Cupos Limitados",
   background_image_url: "/verano2026-tigo.jpg",
@@ -97,12 +96,13 @@ const fallbackPackages: TravelPackage[] = [
 
 async function getPageData() {
   try {
-    const [section, packages] = await Promise.all([
-      getSectionBySlug("verano-2026"),
-      getSpecialPackages("verano-2026"),
-    ]);
+    // Obtener la sección activa (la única que debería existir)
+    const section = await getActiveSection();
 
     if (section) {
+      // Obtener los paquetes de esa sección usando su slug
+      const packages = await getSpecialPackages(section.slug);
+
       return {
         section: {
           ...section,
@@ -132,7 +132,7 @@ async function getPageData() {
   }
 }
 
-export default async function Verano2026Page() {
+export default async function TemporadaPage() {
   const { section, packages } = await getPageData();
 
   return (

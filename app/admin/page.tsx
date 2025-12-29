@@ -24,6 +24,7 @@ interface PackageStats {
 
 interface SectionStats {
   id: string;
+  title: string;
   is_active: boolean;
 }
 
@@ -37,20 +38,19 @@ async function getStats() {
 
   const [packagesRes, sectionsRes, destinationsRes] = await Promise.all([
     supabase.from("packages").select("id, is_active, is_featured, base_price, currency", { count: "exact" }),
-    supabase.from("special_sections").select("id, is_active", { count: "exact" }),
+    supabase.from("special_sections").select("id, title, is_active").limit(1).single(),
     supabase.from("destinations").select("id, is_active", { count: "exact" }),
   ]);
 
   const packages = (packagesRes.data || []) as PackageStats[];
-  const sections = (sectionsRes.data || []) as SectionStats[];
+  const section = sectionsRes.data as SectionStats | null;
   const destinations = (destinationsRes.data || []) as DestinationStats[];
 
   return {
     totalPackages: packages.length,
     activePackages: packages.filter((p) => p.is_active).length,
     featuredPackages: packages.filter((p) => p.is_featured).length,
-    totalSections: sections.length,
-    activeSections: sections.filter((s) => s.is_active).length,
+    sectionTitle: section?.title || "Temporada",
     totalDestinations: destinations.length,
     activeDestinations: destinations.filter((d) => d.is_active).length,
   };
@@ -95,7 +95,7 @@ export default async function AdminDashboard() {
             <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
               <Package className="w-6 h-6 text-violet-600" />
             </div>
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-full">
               +{stats.featuredPackages} destacados
             </span>
           </div>
@@ -117,8 +117,8 @@ export default async function AdminDashboard() {
         {/* Paquetes Activos */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-violet-600" />
             </div>
             <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
               {Math.round((stats.activePackages / stats.totalPackages) * 100) || 0}% activo
@@ -131,33 +131,33 @@ export default async function AdminDashboard() {
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="w-full bg-gray-100 rounded-full h-2">
               <div
-                className="bg-green-500 h-2 rounded-full transition-all"
+                className="bg-violet-500 h-2 rounded-full transition-all"
                 style={{ width: `${(stats.activePackages / stats.totalPackages) * 100 || 0}%` }}
               />
             </div>
           </div>
         </div>
 
-        {/* Secciones */}
+        {/* Sección de Temporada */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-purple-600" />
             </div>
             <span className="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
-              {stats.activeSections} activas
+              Activa
             </span>
           </div>
           <div className="mt-4">
-            <p className="text-3xl font-bold text-gray-900">{stats.totalSections}</p>
-            <p className="text-sm text-gray-500 mt-1">Secciones especiales</p>
+            <p className="text-xl font-bold text-gray-900 truncate">{stats.sectionTitle}</p>
+            <p className="text-sm text-gray-500 mt-1">Sección de temporada</p>
           </div>
           <div className="mt-4 pt-4 border-t border-gray-100">
             <Link
               href="/admin/secciones"
               className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1"
             >
-              Gestionar
+              Editar
               <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
@@ -166,10 +166,10 @@ export default async function AdminDashboard() {
         {/* Destinos */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-              <MapPin className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-purple-600" />
             </div>
-            <span className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
               {stats.activeDestinations} activos
             </span>
           </div>
@@ -180,7 +180,7 @@ export default async function AdminDashboard() {
           <div className="mt-4 pt-4 border-t border-gray-100">
             <Link
               href="/admin/destinos"
-              className="text-sm font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1"
+              className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1"
             >
               Configurar
               <ArrowUpRight className="w-3 h-3" />
@@ -211,24 +211,24 @@ export default async function AdminDashboard() {
           </Link>
 
           <Link
-            href="/admin/secciones/nueva"
+            href="/admin/secciones"
             className="group p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
           >
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-purple-200 transition-colors">
               <Sparkles className="w-5 h-5 text-purple-600" />
             </div>
-            <p className="font-medium text-gray-900">Nueva Seccion</p>
+            <p className="font-medium text-gray-900">Editar Temporada</p>
             <p className="text-sm text-gray-500 mt-1">
-              Crear oferta especial
+              Modificar sección especial
             </p>
           </Link>
 
           <Link
             href="/admin/destinos"
-            className="group p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+            className="group p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all"
           >
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-orange-200 transition-colors">
-              <MapPin className="w-5 h-5 text-orange-600" />
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-purple-200 transition-colors">
+              <MapPin className="w-5 h-5 text-purple-600" />
             </div>
             <p className="font-medium text-gray-900">Destinos</p>
             <p className="text-sm text-gray-500 mt-1">
@@ -239,10 +239,10 @@ export default async function AdminDashboard() {
           <Link
             href="/"
             target="_blank"
-            className="group p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-green-300 hover:bg-green-50/50 transition-all"
+            className="group p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-violet-300 hover:bg-violet-50/50 transition-all"
           >
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-green-200 transition-colors">
-              <Eye className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-violet-200 transition-colors">
+              <Eye className="w-5 h-5 text-violet-600" />
             </div>
             <p className="font-medium text-gray-900">Ver Sitio</p>
             <p className="text-sm text-gray-500 mt-1">
@@ -256,7 +256,7 @@ export default async function AdminDashboard() {
       <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 lg:p-8 text-white shadow-xl shadow-violet-600/20">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h3 className="text-xl font-semibold">Verano 2026</h3>
+            <h3 className="text-xl font-semibold">{stats.sectionTitle}</h3>
             <p className="text-violet-200 mt-1">
               Tenes {stats.activePackages} paquetes activos listos para vender
             </p>

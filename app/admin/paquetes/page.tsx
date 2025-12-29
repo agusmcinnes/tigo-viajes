@@ -17,6 +17,7 @@ import {
   MoreHorizontal,
   Eye,
   EyeOff,
+  Tag,
 } from "lucide-react";
 import { PackageActions } from "./package-actions";
 
@@ -32,6 +33,7 @@ export default async function PackagesPage() {
 
   const activeCount = packages.filter((p) => p.is_active).length;
   const featuredCount = packages.filter((p) => p.is_featured).length;
+  const offersCount = packages.filter((p) => p.is_offer).length;
 
   return (
     <div className="space-y-6">
@@ -42,7 +44,7 @@ export default async function PackagesPage() {
             Paquetes
           </h1>
           <p className="text-gray-500 mt-1">
-            {packages.length} paquetes en total · {activeCount} activos · {featuredCount} destacados
+            {packages.length} paquetes en total · {activeCount} activos · {featuredCount} destacados · {offersCount} ofertas
           </p>
         </div>
         <Button asChild className="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-600/25">
@@ -54,7 +56,7 @@ export default async function PackagesPage() {
       </div>
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
@@ -68,8 +70,8 @@ export default async function PackagesPage() {
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Eye className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+              <Eye className="w-5 h-5 text-violet-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{activeCount}</p>
@@ -85,6 +87,17 @@ export default async function PackagesPage() {
             <div>
               <p className="text-2xl font-bold text-gray-900">{featuredCount}</p>
               <p className="text-sm text-gray-500">Destacados</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <Tag className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{offersCount}</p>
+              <p className="text-sm text-gray-500">Ofertas</p>
             </div>
           </div>
         </div>
@@ -112,7 +125,7 @@ export default async function PackagesPage() {
                   {/* Badges overlay */}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     {pkg.is_featured && (
-                      <span className="px-2 py-1 bg-yellow-500 text-white text-xs font-medium rounded-lg flex items-center gap-1 shadow-lg">
+                      <span className="px-2 py-1 bg-purple-500 text-white text-xs font-medium rounded-lg flex items-center gap-1 shadow-lg">
                         <Star className="w-3 h-3" />
                         Destacado
                       </span>
@@ -123,11 +136,17 @@ export default async function PackagesPage() {
                         Especial
                       </span>
                     )}
+                    {pkg.is_offer && (
+                      <span className="px-2 py-1 bg-orange-500 text-white text-xs font-medium rounded-lg flex items-center gap-1 shadow-lg">
+                        <Tag className="w-3 h-3" />
+                        Oferta
+                      </span>
+                    )}
                   </div>
                   {/* Status indicator */}
                   <div className="absolute top-3 right-3">
                     {pkg.is_active ? (
-                      <span className="w-3 h-3 bg-green-500 rounded-full block shadow-lg shadow-green-500/50" />
+                      <span className="w-3 h-3 bg-violet-500 rounded-full block shadow-lg shadow-violet-500/50" />
                     ) : (
                       <span className="w-3 h-3 bg-gray-400 rounded-full block" />
                     )}
@@ -219,6 +238,8 @@ export default async function PackagesPage() {
                         <PackageActions
                           packageId={pkg.id}
                           isActive={pkg.is_active}
+                          isOffer={pkg.is_offer}
+                          isFeatured={pkg.is_featured}
                         />
                       </div>
                     </div>

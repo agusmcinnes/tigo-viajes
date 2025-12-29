@@ -13,6 +13,7 @@ import {
   Sun,
   ArrowRight,
   Plane,
+  Tag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,11 +48,18 @@ const fallbackDestinations: Destination[] = [
   },
 ];
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  href: string;
+  hasDropdown?: boolean;
+  isSpecial?: boolean;
+}
+
+const baseNavLinks: NavLink[] = [
   { name: "Inicio", href: "/" },
+  { name: "Ofertas", href: "/ofertas" },
   { name: "Nosotros", href: "/#nosotros" },
   { name: "Destinos", href: "/#destinos", hasDropdown: true },
-  { name: "Verano 2026", href: "/verano-2026", isSpecial: true },
   { name: "Contacto", href: "/contacto" },
 ];
 
@@ -63,6 +71,14 @@ export function Header({ variant = "transparent" }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [destinations, setDestinations] = useState<Destination[]>(fallbackDestinations);
+  const [sectionName, setSectionName] = useState("Temporada");
+
+  // Generar navLinks dinámicamente con el nombre de la sección
+  const navLinks: NavLink[] = [
+    ...baseNavLinks.slice(0, 3), // Inicio, Nosotros, Destinos
+    { name: sectionName, href: "/temporada", isSpecial: true },
+    ...baseNavLinks.slice(3), // Contacto
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,21 +88,23 @@ export function Header({ variant = "transparent" }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Cargar destinos desde Supabase
+  // Cargar destinos y nombre de sección desde Supabase
   useEffect(() => {
-    async function loadDestinations() {
+    async function loadData() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase
+
+        // Cargar destinos
+        const { data: destinationsData, error: destError } = await supabase
           .from("destinations")
           .select("name, slug, image_url")
           .eq("is_active", true)
           .order("display_order", { ascending: true });
 
-        if (!error && data && data.length > 0) {
-          const destinationsData = data as { name: string; slug: string; image_url: string | null }[];
+        if (!destError && destinationsData && destinationsData.length > 0) {
+          const destList = destinationsData as { name: string; slug: string; image_url: string | null }[];
           setDestinations(
-            destinationsData.map((d) => ({
+            destList.map((d) => ({
               name: d.name,
               slug: d.slug,
               image: d.image_url || "",
@@ -94,11 +112,23 @@ export function Header({ variant = "transparent" }: HeaderProps) {
             }))
           );
         }
+
+        // Cargar nombre de sección
+        const { data: sectionData } = await supabase
+          .from("special_sections")
+          .select("title")
+          .limit(1)
+          .single();
+
+        const section = sectionData as { title: string } | null;
+        if (section?.title) {
+          setSectionName(section.title);
+        }
       } catch {
         // Usar fallback en caso de error
       }
     }
-    loadDestinations();
+    loadData();
   }, []);
 
   // Si variant es "solid", siempre mostrar como scrolled (fondo blanco)
@@ -154,7 +184,7 @@ export function Header({ variant = "transparent" }: HeaderProps) {
                       "relative px-4 py-2 transition-colors duration-300 flex items-center gap-1 font-medium",
                       showSolidHeader
                         ? "text-foreground hover:text-primary"
-                        : "text-white hover:text-secondary"
+                        : "text-white hover:text-primary"
                     )}>
                       {link.name}
                       <ChevronDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" />
@@ -232,7 +262,7 @@ export function Header({ variant = "transparent" }: HeaderProps) {
                       "relative px-4 py-2 transition-colors duration-300 font-medium group",
                       showSolidHeader
                         ? "text-foreground hover:text-primary"
-                        : "text-white hover:text-secondary"
+                        : "text-white hover:text-primary"
                     )}
                   >
                     {link.name}
@@ -362,6 +392,7 @@ export function Header({ variant = "transparent" }: HeaderProps) {
                                   : "bg-primary/10"
                               )}>
                                 {link.name === "Inicio" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
+                                {link.name === "Ofertas" && <Tag className="w-5 h-5 text-secondary" />}
                                 {link.name === "Nosotros" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
                                 {link.isSpecial && <Sun className="w-5 h-5 text-white" />}
                                 {link.name === "Contacto" && <Mail className="w-5 h-5 text-primary" />}

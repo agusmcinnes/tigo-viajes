@@ -55,6 +55,7 @@ export function toDisplayFormat(
     imageUrl: pkg.image_url,
     isGroupal: pkg.is_groupal,
     isFeatured: pkg.is_featured,
+    isOffer: pkg.is_offer,
     includedServices: pkg.included_services,
     additionalServices: pkg.optional_excursions,
   };
@@ -156,6 +157,38 @@ export async function getFeaturedPackages(): Promise<TravelPackageDisplay[]> {
     .select("*")
     .eq("is_active", true)
     .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  if (error) throw error;
+
+  const pkgList = (packages || []) as Package[];
+
+  const packagesWithDates = await Promise.all(
+    pkgList.map(async (pkg) => {
+      const { data: dates } = await supabase
+        .from("package_departure_dates")
+        .select("departure_date, price, currency")
+        .eq("package_id", pkg.id)
+        .eq("is_active", true)
+        .order("departure_date", { ascending: true })
+        .limit(4);
+
+      return toDisplayFormat(pkg, (dates || []) as DepartureDateResult[]);
+    })
+  );
+
+  return packagesWithDates;
+}
+
+export async function getOfferPackages(): Promise<TravelPackageDisplay[]> {
+  const supabase = await createClient();
+
+  const { data: packages, error } = await supabase
+    .from("packages")
+    .select("*")
+    .eq("is_active", true)
+    .eq("is_offer", true)
     .order("created_at", { ascending: false })
     .limit(6);
 

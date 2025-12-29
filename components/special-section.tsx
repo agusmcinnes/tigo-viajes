@@ -68,13 +68,13 @@ interface SpecialSectionProps {
 
 // Datos por defecto
 const defaultSection: SpecialSectionData = {
-  slug: "verano-2026",
-  title: "Verano 2026",
+  slug: "temporada",
+  title: "Temporada Especial",
   subtitle:
     "Viajes en bus grupales con las mejores comodidades. Bus Mix de última generación, servicio a bordo y coordinador.",
   badge_text: "Salidas Grupales",
   background_image_url: "/verano2026-tigo.jpg",
-  cta_text: "Ver Ofertas de Verano",
+  cta_text: "Ver Ofertas",
 };
 
 const defaultFeatures: Feature[] = [
@@ -200,7 +200,7 @@ export function SpecialSection({ section, features }: SpecialSectionProps) {
               className="bg-white text-secondary hover:bg-white/90 text-lg px-8 py-6 rounded-full shadow-xl"
             >
               <Link
-                href={`/${sectionData.slug}`}
+                href="/temporada"
                 className="flex items-center gap-2"
               >
                 {sectionData.cta_text || "Ver Ofertas"}

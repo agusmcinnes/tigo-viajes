@@ -60,6 +60,7 @@ export function PackageForm({
     not_included_services: pkg?.not_included_services || [],
     optional_excursions: pkg?.optional_excursions || [],
     is_featured: pkg?.is_featured || false,
+    is_offer: pkg?.is_offer || false,
     is_special: pkg?.is_special || false,
     special_section_id: pkg?.special_section_id || "",
     is_active: pkg?.is_active ?? true,
@@ -520,13 +521,13 @@ export function PackageForm({
             {formData.included_services.map((service, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                className="inline-flex items-center gap-1 bg-violet-100 text-violet-800 px-3 py-1 rounded-full text-sm"
               >
                 {service}
                 <button
                   type="button"
                   onClick={() => removeService("included_services", i)}
-                  className="hover:text-green-900"
+                  className="hover:text-violet-900"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -675,6 +676,17 @@ export function PackageForm({
               className="w-5 h-5 rounded border-border"
             />
             <span>Grupal</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.is_offer}
+              onChange={(e) =>
+                setFormData({ ...formData, is_offer: e.target.checked })
+              }
+              className="w-5 h-5 rounded border-border"
+            />
+            <span>Oferta</span>
           </label>
         </div>
 

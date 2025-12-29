@@ -238,7 +238,7 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
               onChange={(e) =>
                 setFormData({ ...formData, slug: e.target.value })
               }
-              placeholder="verano-2026"
+              placeholder="temporada-actual"
               required
             />
           </div>

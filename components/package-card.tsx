@@ -24,6 +24,7 @@ export interface TravelPackage {
   imageUrl: string;
   isGroupal?: boolean;
   isFeatured?: boolean;
+  isOffer?: boolean;
   includedServices: string[];
   additionalServices?: string[];
 }
@@ -61,6 +62,11 @@ export function PackageCard({ package: pkg, index = 0 }: PackageCardProps) {
             {pkg.isFeatured && (
               <Badge className="bg-primary text-white border-0">
                 Destacado
+              </Badge>
+            )}
+            {pkg.isOffer && (
+              <Badge className="bg-orange-500 text-white border-0">
+                Oferta
               </Badge>
             )}
           </div>

@@ -19,14 +19,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreVertical, Eye, EyeOff, Copy, Trash2, Loader2 } from "lucide-react";
+import { MoreVertical, Eye, EyeOff, Copy, Trash2, Loader2, Star, Tag } from "lucide-react";
 
 interface PackageActionsProps {
   packageId: string;
   isActive: boolean;
+  isOffer?: boolean;
+  isFeatured?: boolean;
 }
 
-export function PackageActions({ packageId, isActive }: PackageActionsProps) {
+export function PackageActions({ packageId, isActive, isOffer = false, isFeatured = false }: PackageActionsProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -38,6 +40,32 @@ export function PackageActions({ packageId, isActive }: PackageActionsProps) {
     await supabase
       .from("packages")
       .update({ is_active: !isActive } as never)
+      .eq("id", packageId);
+
+    router.refresh();
+    setLoading(false);
+  };
+
+  const handleToggleOffer = async () => {
+    setLoading(true);
+    const supabase = createClient();
+
+    await supabase
+      .from("packages")
+      .update({ is_offer: !isOffer } as never)
+      .eq("id", packageId);
+
+    router.refresh();
+    setLoading(false);
+  };
+
+  const handleToggleFeatured = async () => {
+    setLoading(true);
+    const supabase = createClient();
+
+    await supabase
+      .from("packages")
+      .update({ is_featured: !isFeatured } as never)
       .eq("id", packageId);
 
     router.refresh();
@@ -108,6 +136,16 @@ export function PackageActions({ packageId, isActive }: PackageActionsProps) {
               </>
             )}
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleToggleFeatured}>
+            <Star className={`w-4 h-4 mr-2 ${isFeatured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+            {isFeatured ? "Quitar Destacado" : "Marcar Destacado"}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleToggleOffer}>
+            <Tag className={`w-4 h-4 mr-2 ${isOffer ? "fill-orange-500 text-orange-500" : ""}`} />
+            {isOffer ? "Quitar Oferta" : "Marcar como Oferta"}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleDuplicate}>
             <Copy className="w-4 h-4 mr-2" />
             Duplicar

@@ -18,7 +18,7 @@ const quickLinks = [
   { name: "Inicio", href: "/" },
   { name: "Nosotros", href: "/#nosotros" },
   { name: "Destinos", href: "/#destinos" },
-  { name: "Verano 2026", href: "/verano-2026" },
+  { name: "Temporada", href: "/temporada" },
   { name: "Contacto", href: "/contacto" },
 ];
 

@@ -143,6 +143,7 @@ export interface Database {
           not_included_services: string[];
           optional_excursions: string[];
           is_featured: boolean;
+          is_offer: boolean;
           is_special: boolean;
           special_section_id: string | null;
           is_active: boolean;
@@ -168,6 +169,7 @@ export interface Database {
           not_included_services?: string[];
           optional_excursions?: string[];
           is_featured?: boolean;
+          is_offer?: boolean;
           is_special?: boolean;
           special_section_id?: string | null;
           is_active?: boolean;
@@ -193,6 +195,7 @@ export interface Database {
           not_included_services?: string[];
           optional_excursions?: string[];
           is_featured?: boolean;
+          is_offer?: boolean;
           is_special?: boolean;
           special_section_id?: string | null;
           is_active?: boolean;
@@ -288,6 +291,7 @@ export interface TravelPackageDisplay {
   imageUrl: string;
   isGroupal?: boolean;
   isFeatured?: boolean;
+  isOffer?: boolean;
   includedServices: string[];
   additionalServices?: string[];
 }

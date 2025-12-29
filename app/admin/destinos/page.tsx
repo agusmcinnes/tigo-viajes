@@ -145,7 +145,7 @@ export default function DestinationsPage() {
             {destinations.length} destinos en total · {activeCount} activos
           </p>
         </div>
-        <Button onClick={openCreateDialog} className="bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-600/25">
+        <Button onClick={openCreateDialog} className="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-600/25">
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Destino
         </Button>
@@ -155,8 +155,8 @@ export default function DestinationsPage() {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Globe className="w-5 h-5 text-orange-600" />
+            <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+              <Globe className="w-5 h-5 text-violet-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{destinations.length}</p>
@@ -166,8 +166,8 @@ export default function DestinationsPage() {
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Eye className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Eye className="w-5 h-5 text-purple-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{activeCount}</p>
@@ -186,8 +186,8 @@ export default function DestinationsPage() {
         </div>
       ) : destinations.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-          <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <MapPin className="w-8 h-8 text-orange-600" />
+          <div className="w-16 h-16 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <MapPin className="w-8 h-8 text-violet-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">
             No hay destinos creados
@@ -195,7 +195,7 @@ export default function DestinationsPage() {
           <p className="text-gray-500 mt-1 mb-6">
             Los destinos aparecen en el menu de navegacion del sitio
           </p>
-          <Button onClick={openCreateDialog} className="bg-orange-600 hover:bg-orange-700">
+          <Button onClick={openCreateDialog} className="bg-violet-600 hover:bg-violet-700">
             <Plus className="w-4 h-4 mr-2" />
             Crear primer destino
           </Button>
@@ -219,14 +219,14 @@ export default function DestinationsPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
                     <MapPin className="w-12 h-12 text-white/50" />
                   </div>
                 )}
                 {/* Status Badge */}
                 <div className="absolute top-2 right-2">
                   {dest.is_active ? (
-                    <span className="w-3 h-3 bg-green-500 rounded-full block shadow-lg shadow-green-500/50" />
+                    <span className="w-3 h-3 bg-violet-500 rounded-full block shadow-lg shadow-violet-500/50" />
                   ) : (
                     <span className="w-3 h-3 bg-gray-400 rounded-full block" />
                   )}
@@ -338,7 +338,7 @@ export default function DestinationsPage() {
             <Button
               onClick={handleSave}
               disabled={saving || !formData.name || !formData.slug}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-violet-600 hover:bg-violet-700"
             >
               {saving ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
