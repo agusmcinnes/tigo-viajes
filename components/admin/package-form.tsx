@@ -72,6 +72,18 @@ export function PackageForm({
   );
   const [newDate, setNewDate] = useState({ date: "", price: "", currency: "USD" });
 
+  // Itinerary days state
+  const [itineraryDays, setItineraryDays] = useState<
+    { id: string; day_number: number; title: string; description: string }[]
+  >(
+    pkg?.itinerary_days?.map((d) => ({
+      id: d.id,
+      day_number: d.day_number,
+      title: d.title,
+      description: d.description,
+    })) || []
+  );
+
   // Temp inputs for array fields
   const [newIncluded, setNewIncluded] = useState("");
   const [newNotIncluded, setNewNotIncluded] = useState("");
@@ -154,6 +166,30 @@ export function PackageForm({
     setDepartureDates(departureDates.filter((_, i) => i !== index));
   };
 
+  const addItineraryDay = () => {
+    const nextDay = itineraryDays.length > 0
+      ? Math.max(...itineraryDays.map((d) => d.day_number)) + 1
+      : 1;
+    setItineraryDays([
+      ...itineraryDays,
+      { id: `new-${Date.now()}`, day_number: nextDay, title: "", description: "" },
+    ]);
+  };
+
+  const updateItineraryDay = (
+    index: number,
+    field: "day_number" | "title" | "description",
+    value: string | number
+  ) => {
+    const updated = [...itineraryDays];
+    updated[index] = { ...updated[index], [field]: value };
+    setItineraryDays(updated);
+  };
+
+  const removeItineraryDay = (index: number) => {
+    setItineraryDays(itineraryDays.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -202,6 +238,23 @@ export function PackageForm({
             })) as never
           );
         }
+
+        // Update itinerary days - delete all and re-insert
+        await supabase
+          .from("package_itinerary_days")
+          .delete()
+          .eq("package_id", pkg.id);
+
+        if (itineraryDays.length > 0) {
+          await supabase.from("package_itinerary_days").insert(
+            itineraryDays.map((d) => ({
+              package_id: pkg.id,
+              day_number: d.day_number,
+              title: d.title,
+              description: d.description,
+            })) as never
+          );
+        }
       } else {
         // Create new package
         const { data: newPkg, error } = await supabase
@@ -221,6 +274,19 @@ export function PackageForm({
               departure_date: d.departure_date,
               price: d.price,
               currency: d.currency,
+            })) as never
+          );
+        }
+
+        // Insert itinerary days
+        if (itineraryDays.length > 0 && newPkg) {
+          const newPkgData = newPkg as { id: string };
+          await supabase.from("package_itinerary_days").insert(
+            itineraryDays.map((d) => ({
+              package_id: newPkgData.id,
+              day_number: d.day_number,
+              title: d.title,
+              description: d.description,
             })) as never
           );
         }
@@ -574,13 +640,13 @@ export function PackageForm({
             {formData.not_included_services.map((service, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm"
+                className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm"
               >
                 {service}
                 <button
                   type="button"
                   onClick={() => removeService("not_included_services", i)}
-                  className="hover:text-red-900"
+                  className="hover:text-amber-900"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -637,6 +703,75 @@ export function PackageForm({
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Itinerary */}
+      <div className="bg-white rounded-xl border border-border p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Itinerario</h2>
+          <Button type="button" variant="outline" size="sm" onClick={addItineraryDay}>
+            <Plus className="w-4 h-4 mr-2" />
+            Agregar Día
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {itineraryDays
+            .sort((a, b) => a.day_number - b.day_number)
+            .map((day, index) => (
+              <div
+                key={day.id}
+                className="flex gap-4 items-start p-4 border rounded-lg bg-muted/30"
+              >
+                <div className="space-y-2 w-20 shrink-0">
+                  <Label>Día</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={day.day_number}
+                    onChange={(e) =>
+                      updateItineraryDay(index, "day_number", parseInt(e.target.value) || 1)
+                    }
+                  />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <Label>Título</Label>
+                  <Input
+                    value={day.title}
+                    onChange={(e) =>
+                      updateItineraryDay(index, "title", e.target.value)
+                    }
+                    placeholder="Ej: Llegada y city tour"
+                  />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <Label>Descripción</Label>
+                  <Input
+                    value={day.description}
+                    onChange={(e) =>
+                      updateItineraryDay(index, "description", e.target.value)
+                    }
+                    placeholder="Descripción de las actividades del día"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-7"
+                  onClick={() => removeItineraryDay(index)}
+                >
+                  <X className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+        </div>
+
+        {itineraryDays.length === 0 && (
+          <p className="text-center text-muted-foreground py-4">
+            No hay itinerario. Agregá días para detallar las actividades del paquete.
+          </p>
+        )}
       </div>
 
       {/* Flags */}

@@ -1,8 +1,9 @@
+import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { SpecialPageContent } from "./special-page-content";
-import { getActiveSection } from "@/lib/services/sections";
+import { getActiveSection, getSections } from "@/lib/services/sections";
 import { getSpecialPackages } from "@/lib/services/packages";
 import { TravelPackage } from "@/components/package-card";
 
@@ -41,66 +42,22 @@ const fallbackPackages: TravelPackage[] = [
     isFeatured: true,
     includedServices: ["Bus Mix de última generación", "4 noches de alojamiento", "Desayuno diario", "Coordinador de viaje"],
   },
-  {
-    id: "2",
-    slug: "glaciares-tierra-gigantes",
-    name: "Los Glaciares - Tierra de Gigantes",
-    description: "Descubrí la majestuosidad del Perito Moreno y los paisajes patagónicos más impresionantes.",
-    destination: "Argentina",
-    destinationSlug: "argentina",
-    price: "ARS 690.000",
-    duration: "6 días / 4 noches",
-    nights: 4,
-    groupSize: "40 pasajeros",
-    dates: ["23 Ene 2026"],
-    imageUrl: "https://images.unsplash.com/photo-1516815231560-8f41ec531527?q=80&w=2069",
-    isGroupal: true,
-    isFeatured: true,
-    includedServices: ["Bus Mix de última generación", "4 noches de alojamiento", "Desayuno diario", "Coordinador de viaje"],
-  },
-  {
-    id: "3",
-    slug: "federacion-camboriu",
-    name: "Federación y Camboriú",
-    description: "Lo mejor de Argentina y Brasil en un solo viaje. Termas y playas brasileñas.",
-    destination: "Brasil",
-    destinationSlug: "brasil",
-    price: "USD 990",
-    duration: "10 días / 8 noches",
-    nights: 8,
-    groupSize: "40 pasajeros",
-    dates: ["31 Ene 2026"],
-    imageUrl: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2070",
-    isGroupal: true,
-    isFeatured: true,
-    includedServices: ["Bus Mix de última generación", "8 noches de alojamiento", "Desayuno diario", "Coordinador de viaje"],
-  },
-  {
-    id: "4",
-    slug: "cataratas-iguazu",
-    name: "Cataratas del Iguazú",
-    description: "Una de las maravillas naturales del mundo. Lado argentino y brasileño incluidos.",
-    destination: "Argentina",
-    destinationSlug: "argentina",
-    price: "ARS 560.000",
-    duration: "6 días / 4 noches",
-    nights: 4,
-    groupSize: "40 pasajeros",
-    dates: ["1 Feb 2026"],
-    imageUrl: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?q=80&w=2074",
-    isGroupal: true,
-    isFeatured: true,
-    includedServices: ["Bus Mix de última generación", "4 noches de alojamiento", "Desayuno diario", "Coordinador de viaje"],
-  },
 ];
 
 async function getPageData() {
   try {
-    // Obtener la sección activa (la única que debería existir)
+    // Si hay múltiples secciones activas, redirigir a la primera
+    const activeSections = await getSections();
+
+    if (activeSections.length > 0) {
+      // Redirigir a la primera sección activa
+      redirect(`/temporada/${activeSections[0].slug}`);
+    }
+
+    // Fallback: intentar obtener la sección activa directamente
     const section = await getActiveSection();
 
     if (section) {
-      // Obtener los paquetes de esa sección usando su slug
       const packages = await getSpecialPackages(section.slug);
 
       return {
@@ -120,7 +77,11 @@ async function getPageData() {
       },
       packages: fallbackPackages,
     };
-  } catch {
+  } catch (error) {
+    // Check if it's a redirect (Next.js throws NEXT_REDIRECT)
+    if (error && typeof error === "object" && "digest" in error) {
+      throw error;
+    }
     // Fallback a datos hardcodeados
     return {
       section: {

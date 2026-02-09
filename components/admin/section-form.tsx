@@ -57,6 +57,9 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
     cta_text: section?.cta_text || "Ver Ofertas",
     cta_url: section?.cta_url || "",
     is_active: section?.is_active ?? true,
+    nav_label: section?.nav_label || "",
+    nav_icon_name: section?.nav_icon_name || "Sun",
+    nav_color: section?.nav_color || "#FE4F00",
   });
 
   // Features state
@@ -440,6 +443,69 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
             No hay paquetes disponibles. Creá paquetes primero.
           </p>
         )}
+      </div>
+
+      {/* Nav Button Config */}
+      <div className="bg-white rounded-xl border border-border p-6 space-y-6">
+        <h2 className="text-lg font-semibold">Botón del Menú</h2>
+        <p className="text-sm text-muted-foreground">
+          Configurá cómo aparece esta sección en el menú de navegación
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="nav_label">Etiqueta del Botón</Label>
+            <Input
+              id="nav_label"
+              value={formData.nav_label || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, nav_label: e.target.value })
+              }
+              placeholder={formData.title || "Usar título como etiqueta"}
+            />
+            <p className="text-xs text-muted-foreground">
+              Si se deja vacío, se usa el título de la sección
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label>Icono</Label>
+            <select
+              value={formData.nav_icon_name || "Sun"}
+              onChange={(e) =>
+                setFormData({ ...formData, nav_icon_name: e.target.value })
+              }
+              className="w-full h-10 px-3 border rounded-md bg-background"
+            >
+              {availableIcons.map((icon) => (
+                <option key={icon} value={icon}>
+                  {icon}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="nav_color">Color del Botón</Label>
+            <div className="flex gap-2 items-center">
+              <input
+                type="color"
+                id="nav_color"
+                value={formData.nav_color || "#FE4F00"}
+                onChange={(e) =>
+                  setFormData({ ...formData, nav_color: e.target.value })
+                }
+                className="w-10 h-10 rounded border cursor-pointer"
+              />
+              <Input
+                value={formData.nav_color || "#FE4F00"}
+                onChange={(e) =>
+                  setFormData({ ...formData, nav_color: e.target.value })
+                }
+                placeholder="#FE4F00"
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Options */}

@@ -26,7 +26,9 @@ export interface TravelPackage {
   isFeatured?: boolean;
   isOffer?: boolean;
   includedServices: string[];
+  notIncludedServices?: string[];
   additionalServices?: string[];
+  itineraryDays?: { dayNumber: number; title: string; description: string }[];
 }
 
 interface PackageCardProps {

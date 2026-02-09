@@ -14,6 +14,20 @@ import {
   ArrowRight,
   Plane,
   Tag,
+  Umbrella,
+  Waves,
+  Sparkles,
+  Palmtree,
+  Hotel,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+  LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,11 +62,41 @@ const fallbackDestinations: Destination[] = [
   },
 ];
 
+const iconMap: Record<string, LucideIcon> = {
+  Sun,
+  Umbrella,
+  Waves,
+  Sparkles,
+  Palmtree,
+  Plane,
+  Hotel,
+  MapPin,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+  Tag,
+};
+
+interface SpecialSectionNav {
+  slug: string;
+  title: string;
+  nav_label: string | null;
+  nav_icon_name: string | null;
+  nav_color: string | null;
+}
+
 interface NavLink {
   name: string;
   href: string;
   hasDropdown?: boolean;
   isSpecial?: boolean;
+  navColor?: string;
+  navIconName?: string;
 }
 
 const baseNavLinks: NavLink[] = [
@@ -71,13 +115,21 @@ export function Header({ variant = "transparent" }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [destinations, setDestinations] = useState<Destination[]>(fallbackDestinations);
-  const [sectionName, setSectionName] = useState("Temporada");
+  const [specialSections, setSpecialSections] = useState<SpecialSectionNav[]>([]);
 
-  // Generar navLinks dinámicamente con el nombre de la sección
+  // Generar navLinks dinámicamente con las secciones especiales
+  const specialLinks: NavLink[] = specialSections.map((s) => ({
+    name: s.nav_label || s.title,
+    href: `/temporada/${s.slug}`,
+    isSpecial: true,
+    navColor: s.nav_color || "#FE4F00",
+    navIconName: s.nav_icon_name || "Sun",
+  }));
+
   const navLinks: NavLink[] = [
-    ...baseNavLinks.slice(0, 3), // Inicio, Nosotros, Destinos
-    { name: sectionName, href: "/temporada", isSpecial: true },
-    ...baseNavLinks.slice(3), // Contacto
+    ...baseNavLinks.slice(0, 3), // Inicio, Ofertas, Nosotros
+    ...specialLinks,
+    ...baseNavLinks.slice(3), // Destinos, Contacto
   ];
 
   useEffect(() => {
@@ -113,16 +165,17 @@ export function Header({ variant = "transparent" }: HeaderProps) {
           );
         }
 
-        // Cargar nombre de sección
-        const { data: sectionData } = await supabase
+        // Cargar secciones especiales activas
+        const { data: sectionsData } = await supabase
           .from("special_sections")
-          .select("title")
-          .limit(1)
-          .single();
+          .select("slug, title, nav_label, nav_icon_name, nav_color")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
 
-        const section = sectionData as { title: string } | null;
-        if (section?.title) {
-          setSectionName(section.title);
+        if (sectionsData && sectionsData.length > 0) {
+          setSpecialSections(
+            sectionsData as SpecialSectionNav[]
+          );
         }
       } catch {
         // Usar fallback en caso de error
@@ -244,16 +297,22 @@ export function Header({ variant = "transparent" }: HeaderProps) {
                     </div>
                   </div>
                 ) : link.isSpecial ? (
-                  <Button
-                    key={link.name}
-                    asChild
-                    className="bg-secondary hover:bg-secondary/90 text-white ml-2 rounded-full"
-                  >
-                    <Link href={link.href} className="flex items-center gap-2">
-                      <Sun className="w-4 h-4" />
-                      {link.name}
-                    </Link>
-                  </Button>
+                  (() => {
+                    const IconComp = iconMap[link.navIconName || "Sun"] || Sun;
+                    return (
+                      <Button
+                        key={link.name}
+                        asChild
+                        className="text-white ml-2 rounded-full"
+                        style={{ backgroundColor: link.navColor || "#FE4F00" }}
+                      >
+                        <Link href={link.href} className="flex items-center gap-2">
+                          <IconComp className="w-4 h-4" />
+                          {link.name}
+                        </Link>
+                      </Button>
+                    );
+                  })()
                 ) : (
                   <Link
                     key={link.name}
@@ -375,39 +434,48 @@ export function Header({ variant = "transparent" }: HeaderProps) {
                               </div>
                             </div>
                           ) : (
-                            <Link
-                              href={link.href}
-                              className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                                link.isSpecial
-                                  ? "bg-gradient-to-r from-secondary/10 to-orange-500/10 text-secondary"
-                                  : "text-foreground hover:bg-primary/5"
-                              )}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <div className={cn(
-                                "w-10 h-10 rounded-xl flex items-center justify-center",
-                                link.isSpecial
-                                  ? "bg-gradient-to-br from-secondary to-orange-500"
-                                  : "bg-primary/10"
-                              )}>
-                                {link.name === "Inicio" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
-                                {link.name === "Ofertas" && <Tag className="w-5 h-5 text-secondary" />}
-                                {link.name === "Nosotros" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
-                                {link.isSpecial && <Sun className="w-5 h-5 text-white" />}
-                                {link.name === "Contacto" && <Mail className="w-5 h-5 text-primary" />}
-                              </div>
-                              <div className="flex-1">
-                                <span className="font-medium">{link.name}</span>
-                                {link.isSpecial && (
-                                  <p className="text-xs text-secondary/70">Ofertas especiales</p>
-                                )}
-                              </div>
-                              <ArrowRight className={cn(
-                                "w-4 h-4 transition-transform",
-                                link.isSpecial ? "text-secondary" : "text-muted-foreground"
-                              )} />
-                            </Link>
+                            (() => {
+                              const MobileIconComp = link.isSpecial
+                                ? iconMap[link.navIconName || "Sun"] || Sun
+                                : null;
+                              return (
+                                <Link
+                                  href={link.href}
+                                  className={cn(
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                                    link.isSpecial
+                                      ? "text-foreground"
+                                      : "text-foreground hover:bg-primary/5"
+                                  )}
+                                  style={link.isSpecial ? { backgroundColor: `${link.navColor || "#FE4F00"}15` } : undefined}
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                  <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                    style={link.isSpecial ? { backgroundColor: link.navColor || "#FE4F00" } : undefined}
+                                  >
+                                    {link.isSpecial && MobileIconComp && <MobileIconComp className="w-5 h-5 text-white" />}
+                                    {!link.isSpecial && link.name === "Inicio" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
+                                    {!link.isSpecial && link.name === "Ofertas" && <Tag className="w-5 h-5 text-secondary" />}
+                                    {!link.isSpecial && link.name === "Nosotros" && <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
+                                    {!link.isSpecial && link.name === "Contacto" && <Mail className="w-5 h-5 text-primary" />}
+                                    {!link.isSpecial && !["Inicio", "Ofertas", "Nosotros", "Contacto"].includes(link.name) && <div className="w-5 h-5 bg-primary/10 rounded" />}
+                                  </div>
+                                  <div className="flex-1">
+                                    <span className="font-medium">{link.name}</span>
+                                    {link.isSpecial && (
+                                      <p className="text-xs opacity-70">Ofertas especiales</p>
+                                    )}
+                                  </div>
+                                  <ArrowRight className={cn(
+                                    "w-4 h-4 transition-transform",
+                                    link.isSpecial ? "" : "text-muted-foreground"
+                                  )}
+                                  style={link.isSpecial ? { color: link.navColor || "#FE4F00" } : undefined}
+                                  />
+                                </Link>
+                              );
+                            })()
                           )}
                         </motion.li>
                       ))}

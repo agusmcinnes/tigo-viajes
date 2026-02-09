@@ -3,6 +3,7 @@ import type {
   Package,
   PackageWithDepartures,
   PackageDepartureDate,
+  PackageItineraryDay,
   TravelPackageDisplay,
   InsertTables,
   UpdateTables,
@@ -11,7 +12,8 @@ import type {
 // Función para convertir Package de BD a formato display
 export function toDisplayFormat(
   pkg: Package,
-  departureDates?: { departure_date: string; price: number; currency: string }[]
+  departureDates?: { departure_date: string; price: number; currency: string }[],
+  itineraryDays?: { day_number: number; title: string; description: string }[]
 ): TravelPackageDisplay {
   const formatPrice = (price: number, currency: string) => {
     if (currency === "ARS") {
@@ -57,7 +59,13 @@ export function toDisplayFormat(
     isFeatured: pkg.is_featured,
     isOffer: pkg.is_offer,
     includedServices: pkg.included_services,
+    notIncludedServices: pkg.not_included_services,
     additionalServices: pkg.optional_excursions,
+    itineraryDays: itineraryDays?.map((d) => ({
+      dayNumber: d.day_number,
+      title: d.title,
+      description: d.description,
+    })),
   };
 }
 
@@ -120,7 +128,17 @@ export async function getPackageById(
     .eq("is_active", true)
     .order("departure_date", { ascending: true });
 
-  return toDisplayFormat(pkgData, (dates || []) as DepartureDateResult[]);
+  const { data: itinerary } = await supabase
+    .from("package_itinerary_days")
+    .select("day_number, title, description")
+    .eq("package_id", pkgData.id)
+    .order("day_number", { ascending: true });
+
+  return toDisplayFormat(
+    pkgData,
+    (dates || []) as DepartureDateResult[],
+    (itinerary || []) as { day_number: number; title: string; description: string }[]
+  );
 }
 
 export async function getPackageBySlug(
@@ -146,7 +164,17 @@ export async function getPackageBySlug(
     .eq("is_active", true)
     .order("departure_date", { ascending: true });
 
-  return toDisplayFormat(pkgData, (dates || []) as DepartureDateResult[]);
+  const { data: itinerary } = await supabase
+    .from("package_itinerary_days")
+    .select("day_number, title, description")
+    .eq("package_id", pkgData.id)
+    .order("day_number", { ascending: true });
+
+  return toDisplayFormat(
+    pkgData,
+    (dates || []) as DepartureDateResult[],
+    (itinerary || []) as { day_number: number; title: string; description: string }[]
+  );
 }
 
 export async function getFeaturedPackages(): Promise<TravelPackageDisplay[]> {
@@ -383,9 +411,16 @@ export async function getPackageAdminById(
     .eq("package_id", pkgData.id)
     .order("departure_date", { ascending: true });
 
+  const { data: itinerary } = await supabase
+    .from("package_itinerary_days")
+    .select("*")
+    .eq("package_id", pkgData.id)
+    .order("day_number", { ascending: true });
+
   return {
     ...pkgData,
     departure_dates: (dates || []) as PackageDepartureDate[],
+    itinerary_days: (itinerary || []) as PackageItineraryDay[],
   };
 }
 
@@ -481,6 +516,50 @@ export async function deleteDepartureDate(id: string) {
 
   const { error } = await supabase
     .from("package_departure_dates")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
+// ============================================
+// ITINERARIO
+// ============================================
+
+export async function addItineraryDay(
+  data: InsertTables<"package_itinerary_days">
+) {
+  const supabase = await createClient();
+
+  const { data: day, error } = await supabase
+    .from("package_itinerary_days")
+    .insert(data as never)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return day;
+}
+
+export async function updateItineraryDay(
+  id: string,
+  data: UpdateTables<"package_itinerary_days">
+) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("package_itinerary_days")
+    .update(data as never)
+    .eq("id", id);
+
+  if (error) throw error;
+}
+
+export async function deleteItineraryDay(id: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("package_itinerary_days")
     .delete()
     .eq("id", id);
 

@@ -55,6 +55,9 @@ export interface Database {
           cta_url: string | null;
           is_active: boolean;
           display_order: number;
+          nav_label: string | null;
+          nav_icon_name: string | null;
+          nav_color: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -71,6 +74,9 @@ export interface Database {
           cta_url?: string | null;
           is_active?: boolean;
           display_order?: number;
+          nav_label?: string | null;
+          nav_icon_name?: string | null;
+          nav_color?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -87,6 +93,9 @@ export interface Database {
           cta_url?: string | null;
           is_active?: boolean;
           display_order?: number;
+          nav_label?: string | null;
+          nav_icon_name?: string | null;
+          nav_color?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -241,6 +250,35 @@ export interface Database {
           updated_at?: string;
         };
       };
+      package_itinerary_days: {
+        Row: {
+          id: string;
+          package_id: string;
+          day_number: number;
+          title: string;
+          description: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          package_id: string;
+          day_number: number;
+          title: string;
+          description: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          package_id?: string;
+          day_number?: number;
+          title?: string;
+          description?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -262,10 +300,12 @@ export type SpecialSection = Tables<"special_sections">;
 export type SpecialSectionFeature = Tables<"special_section_features">;
 export type Package = Tables<"packages">;
 export type PackageDepartureDate = Tables<"package_departure_dates">;
+export type PackageItineraryDay = Tables<"package_itinerary_days">;
 
 // Tipo extendido para paquete con fechas de salida
 export type PackageWithDepartures = Package & {
   departure_dates: PackageDepartureDate[];
+  itinerary_days?: PackageItineraryDay[];
 };
 
 // Tipo extendido para sección con features y paquetes
@@ -293,5 +333,7 @@ export interface TravelPackageDisplay {
   isFeatured?: boolean;
   isOffer?: boolean;
   includedServices: string[];
+  notIncludedServices?: string[];
   additionalServices?: string[];
+  itineraryDays?: { dayNumber: number; title: string; description: string }[];
 }

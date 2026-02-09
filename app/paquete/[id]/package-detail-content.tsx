@@ -12,6 +12,7 @@ import {
   MessageCircle,
   ArrowLeft,
   Moon,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -217,6 +218,33 @@ export function PackageDetailContent({
               </div>
             </motion.div>
 
+            {/* Not Included Services */}
+            {pkg.notIncludedServices && pkg.notIncludedServices.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.32 }}
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+                    <X className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Servicios No Incluidos</h3>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {pkg.notIncludedServices.map((service, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 p-3 rounded-lg bg-amber-50/50"
+                    >
+                      <X className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+                      <span className="text-foreground">{service}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Additional Services */}
             {pkg.additionalServices && pkg.additionalServices.length > 0 && (
               <motion.div
@@ -243,6 +271,50 @@ export function PackageDetailContent({
                       <span className="text-foreground">{service}</span>
                     </div>
                   ))}
+                </div>
+              </motion.div>
+            )}
+            {/* Itinerary */}
+            {pkg.itineraryDays && pkg.itineraryDays.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <Calendar className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold">Itinerario</h3>
+                </div>
+                <div className="relative pl-8">
+                  {/* Vertical line */}
+                  <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-primary/20" />
+                  <div className="space-y-6">
+                    {pkg.itineraryDays.map((day, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
+                        className="relative"
+                      >
+                        {/* Circle */}
+                        <div className="absolute -left-8 top-1 w-[14px] h-[14px] rounded-full bg-primary border-2 border-white shadow-sm" />
+                        <div className="bg-primary/5 rounded-lg p-4">
+                          <span className="text-sm font-medium text-primary">
+                            Día {day.dayNumber}
+                          </span>
+                          <h4 className="font-semibold text-foreground mt-1">
+                            {day.title}
+                          </h4>
+                          <p className="text-muted-foreground text-sm mt-1">
+                            {day.description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
