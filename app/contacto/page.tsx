@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     "Contacta con Tigo Viajes. Estamos en Pigue y Coronel Suárez, Buenos Aires. Llamanos o escribinos por WhatsApp.",
 };
 
-export default function ContactoPage() {
+export default async function ContactoPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <HeaderWrapper />
       <main>
         {/* Hero Section with Glassmorphism */}
         <section className="relative pt-32 pb-24 overflow-hidden">

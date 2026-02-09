@@ -13,28 +13,90 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Save, Loader2, Plus, X, GripVertical } from "lucide-react";
+import {
+  Save,
+  Loader2,
+  Plus,
+  X,
+  GripVertical,
+  Sun,
+  Umbrella,
+  Waves,
+  Sparkles,
+  Palmtree,
+  Plane,
+  Hotel,
+  MapPin,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+  Snowflake,
+  Mountain,
+  MountainSnow,
+  TreePine,
+  Flame,
+  CloudSun,
+  CloudSnow,
+  Thermometer,
+  Wind,
+  Compass,
+  Tent,
+  Bike,
+  Ship,
+  Bus,
+  Coffee,
+  Wine,
+  Utensils,
+  Ticket,
+  LucideIcon,
+} from "lucide-react";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { revalidateSections } from "@/app/admin/actions";
 
-// Iconos disponibles de Lucide
-const availableIcons = [
-  "Sun",
-  "Umbrella",
-  "Waves",
-  "Sparkles",
-  "Palmtree",
-  "Plane",
-  "Hotel",
-  "MapPin",
-  "Camera",
-  "Heart",
-  "Star",
-  "Gift",
-  "Calendar",
-  "Clock",
-  "Users",
-  "Check",
-];
+// Mapa de iconos disponibles
+const iconMap: Record<string, LucideIcon> = {
+  Sun,
+  Umbrella,
+  Waves,
+  Sparkles,
+  Palmtree,
+  Plane,
+  Hotel,
+  MapPin,
+  Camera,
+  Heart,
+  Star,
+  Gift,
+  Calendar,
+  Clock,
+  Users,
+  Check,
+  Snowflake,
+  Mountain,
+  MountainSnow,
+  TreePine,
+  Flame,
+  CloudSun,
+  CloudSnow,
+  Thermometer,
+  Wind,
+  Compass,
+  Tent,
+  Bike,
+  Ship,
+  Bus,
+  Coffee,
+  Wine,
+  Utensils,
+  Ticket,
+};
+
+const availableIcons = Object.keys(iconMap);
 
 interface SectionFormProps {
   section?: SpecialSectionFull;
@@ -206,6 +268,7 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
         }
       }
 
+      await revalidateSections();
       router.push("/admin/secciones");
       router.refresh();
     } catch (error) {
@@ -351,19 +414,26 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
               <div className="flex-1 grid md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Icono</Label>
-                  <select
-                    value={feature.icon_name}
-                    onChange={(e) =>
-                      updateFeature(index, "icon_name", e.target.value)
-                    }
-                    className="w-full h-10 px-3 border rounded-md bg-background"
-                  >
-                    {availableIcons.map((icon) => (
-                      <option key={icon} value={icon}>
-                        {icon}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableIcons.map((iconName) => {
+                      const Icon = iconMap[iconName];
+                      return (
+                        <button
+                          key={iconName}
+                          type="button"
+                          title={iconName}
+                          onClick={() => updateFeature(index, "icon_name", iconName)}
+                          className={`w-9 h-9 flex items-center justify-center rounded-md border transition-colors ${
+                            feature.icon_name === iconName
+                              ? "bg-primary text-white border-primary"
+                              : "bg-background text-muted-foreground border-border hover:bg-muted"
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Título</Label>
@@ -469,19 +539,28 @@ export function SectionForm({ section, allPackages }: SectionFormProps) {
           </div>
           <div className="space-y-2">
             <Label>Icono</Label>
-            <select
-              value={formData.nav_icon_name || "Sun"}
-              onChange={(e) =>
-                setFormData({ ...formData, nav_icon_name: e.target.value })
-              }
-              className="w-full h-10 px-3 border rounded-md bg-background"
-            >
-              {availableIcons.map((icon) => (
-                <option key={icon} value={icon}>
-                  {icon}
-                </option>
-              ))}
-            </select>
+            <div className="flex flex-wrap gap-1.5">
+              {availableIcons.map((iconName) => {
+                const Icon = iconMap[iconName];
+                return (
+                  <button
+                    key={iconName}
+                    type="button"
+                    title={iconName}
+                    onClick={() =>
+                      setFormData({ ...formData, nav_icon_name: iconName })
+                    }
+                    className={`w-9 h-9 flex items-center justify-center rounded-md border transition-colors ${
+                      (formData.nav_icon_name || "Sun") === iconName
+                        ? "bg-primary text-white border-primary"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="nav_color">Color del Botón</Label>

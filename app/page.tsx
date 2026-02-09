@@ -1,4 +1,4 @@
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { HeroSection } from "@/components/hero-section";
 import { PackagesSection } from "@/components/packages-section";
 import { OffersSection } from "@/components/offers-section";
@@ -7,8 +7,11 @@ import { AboutSection } from "@/components/about-section";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import { getFeaturedPackages, getOfferPackages } from "@/lib/services/packages";
-import { getActiveSection } from "@/lib/services/sections";
+import {
+  getCachedFeaturedPackages,
+  getCachedOfferPackages,
+  getCachedActiveSection,
+} from "@/lib/cache";
 
 // Datos de respaldo si Supabase no está configurado
 import { allPackages } from "@/lib/packages-data";
@@ -16,9 +19,9 @@ import { allPackages } from "@/lib/packages-data";
 async function getPageData() {
   try {
     const [packages, offers, section] = await Promise.all([
-      getFeaturedPackages(),
-      getOfferPackages(),
-      getActiveSection(),
+      getCachedFeaturedPackages(),
+      getCachedOfferPackages(),
+      getCachedActiveSection(),
     ]);
 
     return {
@@ -46,7 +49,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <Header />
+      <HeaderWrapper />
       <main>
         <HeroSection />
         <PackagesSection packages={packages} />

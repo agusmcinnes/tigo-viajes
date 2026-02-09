@@ -26,6 +26,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { revalidatePackages } from "@/app/admin/actions";
 
 interface PackageFormProps {
   package?: PackageWithDepartures;
@@ -292,6 +293,7 @@ export function PackageForm({
         }
       }
 
+      await revalidatePackages();
       router.push("/admin/paquetes");
       router.refresh();
     } catch (error) {

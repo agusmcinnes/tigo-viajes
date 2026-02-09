@@ -27,6 +27,24 @@ import {
   Clock,
   Users,
   Check,
+  Snowflake,
+  Mountain,
+  MountainSnow,
+  TreePine,
+  Flame,
+  CloudSun,
+  CloudSnow,
+  Thermometer,
+  Wind,
+  Compass,
+  Tent,
+  Bike,
+  Ship,
+  Bus,
+  Coffee,
+  Wine,
+  Utensils,
+  Ticket,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +56,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 
 interface Destination {
   name: string;
@@ -80,6 +97,24 @@ const iconMap: Record<string, LucideIcon> = {
   Users,
   Check,
   Tag,
+  Snowflake,
+  Mountain,
+  MountainSnow,
+  TreePine,
+  Flame,
+  CloudSun,
+  CloudSnow,
+  Thermometer,
+  Wind,
+  Compass,
+  Tent,
+  Bike,
+  Ship,
+  Bus,
+  Coffee,
+  Wine,
+  Utensils,
+  Ticket,
 };
 
 interface SpecialSectionNav {
@@ -109,13 +144,20 @@ const baseNavLinks: NavLink[] = [
 
 interface HeaderProps {
   variant?: "transparent" | "solid";
+  destinations?: Destination[];
+  specialSections?: SpecialSectionNav[];
 }
 
-export function Header({ variant = "transparent" }: HeaderProps) {
+export function Header({
+  variant = "transparent",
+  destinations: destinationsProp,
+  specialSections: specialSectionsProp,
+}: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [destinations, setDestinations] = useState<Destination[]>(fallbackDestinations);
-  const [specialSections, setSpecialSections] = useState<SpecialSectionNav[]>([]);
+
+  const destinations = destinationsProp && destinationsProp.length > 0 ? destinationsProp : fallbackDestinations;
+  const specialSections = specialSectionsProp || [];
 
   // Generar navLinks dinámicamente con las secciones especiales
   const specialLinks: NavLink[] = specialSections.map((s) => ({
@@ -140,49 +182,6 @@ export function Header({ variant = "transparent" }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Cargar destinos y nombre de sección desde Supabase
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const supabase = createClient();
-
-        // Cargar destinos
-        const { data: destinationsData, error: destError } = await supabase
-          .from("destinations")
-          .select("name, slug, image_url")
-          .eq("is_active", true)
-          .order("display_order", { ascending: true });
-
-        if (!destError && destinationsData && destinationsData.length > 0) {
-          const destList = destinationsData as { name: string; slug: string; image_url: string | null }[];
-          setDestinations(
-            destList.map((d) => ({
-              name: d.name,
-              slug: d.slug,
-              image: d.image_url || "",
-              description: "",
-            }))
-          );
-        }
-
-        // Cargar secciones especiales activas
-        const { data: sectionsData } = await supabase
-          .from("special_sections")
-          .select("slug, title, nav_label, nav_icon_name, nav_color")
-          .eq("is_active", true)
-          .order("display_order", { ascending: true });
-
-        if (sectionsData && sectionsData.length > 0) {
-          setSpecialSections(
-            sectionsData as SpecialSectionNav[]
-          );
-        }
-      } catch {
-        // Usar fallback en caso de error
-      }
-    }
-    loadData();
-  }, []);
 
   // Si variant es "solid", siempre mostrar como scrolled (fondo blanco)
   const showSolidHeader = variant === "solid" || isScrolled;

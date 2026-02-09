@@ -27,6 +27,7 @@ import {
   Globe,
 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { revalidateDestinations } from "@/app/admin/actions";
 
 export default function DestinationsPage() {
   const router = useRouter();
@@ -109,6 +110,7 @@ export default function DestinationsPage() {
       } as never);
     }
 
+    await revalidateDestinations();
     setDialogOpen(false);
     await fetchDestinations();
     setSaving(false);
@@ -119,12 +121,14 @@ export default function DestinationsPage() {
       .from("destinations")
       .update({ is_active: !isActive } as never)
       .eq("id", id);
+    await revalidateDestinations();
     await fetchDestinations();
   };
 
   const handleDelete = async () => {
     if (editingId) {
       await supabase.from("destinations").delete().eq("id", editingId);
+      await revalidateDestinations();
       setDeleteOpen(false);
       setEditingId(null);
       await fetchDestinations();

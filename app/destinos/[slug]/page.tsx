@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { DestinationPageContent } from "./destination-content";
-import { getPackagesByDestination } from "@/lib/services/packages";
-import { getDestinationBySlug } from "@/lib/services/destinations";
+import { getCachedPackagesByDestination, getCachedDestinationBySlug } from "@/lib/cache";
 import { getPackagesByDestination as getPackagesByDestinationMock } from "@/lib/packages-data";
 
 // Datos de destinos de respaldo
@@ -43,15 +42,13 @@ const destinationsData: Record<
 
 async function getDestinationData(slug: string) {
   try {
-    // Intentar obtener datos de Supabase
     const [destination, packages] = await Promise.all([
-      getDestinationBySlug(slug),
-      getPackagesByDestination(slug),
+      getCachedDestinationBySlug(slug),
+      getCachedPackagesByDestination(slug),
     ]);
 
     const fallbackData = destinationsData[slug];
 
-    // Si el destino existe en Supabase, usarlo (tenga o no paquetes)
     if (destination) {
       return {
         destination: {
@@ -69,7 +66,6 @@ async function getDestinationData(slug: string) {
       };
     }
 
-    // Fallback a datos mock si no existe en Supabase
     if (fallbackData) {
       const mockPackages = getPackagesByDestinationMock(slug);
       return {
@@ -80,7 +76,6 @@ async function getDestinationData(slug: string) {
 
     return { destination: null, packages: [] };
   } catch {
-    // Fallback a mock en caso de error
     const fallbackData = destinationsData[slug];
     if (fallbackData) {
       const mockPackages = getPackagesByDestinationMock(slug);
@@ -107,7 +102,7 @@ export default async function DestinationPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <Header variant="solid" />
+      <HeaderWrapper variant="solid" />
       <main className="pt-20">
         <DestinationPageContent destination={destination} packages={packages} />
       </main>

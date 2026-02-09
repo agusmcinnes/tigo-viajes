@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { PackageCard } from "@/components/package-card";
 import { PackageDetailContent } from "./package-detail-content";
-import { getPackageBySlug, getPackageById, getRelatedPackages } from "@/lib/services/packages";
+import {
+  getCachedPackageBySlug,
+  getCachedPackageById,
+  getCachedRelatedPackages,
+} from "@/lib/cache";
 import {
   getPackageById as getPackageByIdMock,
   getRelatedOrFeaturedPackages as getRelatedMock,
@@ -13,14 +17,13 @@ import {
 
 async function getPackageData(id: string) {
   try {
-    // Intentar buscar por UUID (Supabase) o por slug
-    let pkg = await getPackageById(id);
+    let pkg = await getCachedPackageById(id);
     if (!pkg) {
-      pkg = await getPackageBySlug(id);
+      pkg = await getCachedPackageBySlug(id);
     }
 
     if (pkg) {
-      const related = await getRelatedPackages(pkg.slug, pkg.destinationSlug, 3);
+      const related = await getCachedRelatedPackages(pkg.slug, pkg.destinationSlug, 3);
       return { pkg, related };
     }
 
@@ -63,7 +66,7 @@ export default async function PackageDetailPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <Header variant="solid" />
+      <HeaderWrapper variant="solid" />
       <main className="pt-20">
         <PackageDetailContent pkg={pkg} relatedPackages={related} />
       </main>

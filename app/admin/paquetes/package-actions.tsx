@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MoreVertical, Eye, EyeOff, Copy, Trash2, Loader2, Star, Tag } from "lucide-react";
+import { revalidatePackages } from "@/app/admin/actions";
 
 interface PackageActionsProps {
   packageId: string;
@@ -42,6 +43,7 @@ export function PackageActions({ packageId, isActive, isOffer = false, isFeature
       .update({ is_active: !isActive } as never)
       .eq("id", packageId);
 
+    await revalidatePackages();
     router.refresh();
     setLoading(false);
   };
@@ -55,6 +57,7 @@ export function PackageActions({ packageId, isActive, isOffer = false, isFeature
       .update({ is_offer: !isOffer } as never)
       .eq("id", packageId);
 
+    await revalidatePackages();
     router.refresh();
     setLoading(false);
   };
@@ -68,6 +71,7 @@ export function PackageActions({ packageId, isActive, isOffer = false, isFeature
       .update({ is_featured: !isFeatured } as never)
       .eq("id", packageId);
 
+    await revalidatePackages();
     router.refresh();
     setLoading(false);
   };
@@ -95,6 +99,7 @@ export function PackageActions({ packageId, isActive, isOffer = false, isFeature
       } as never);
     }
 
+    await revalidatePackages();
     router.refresh();
     setLoading(false);
   };
@@ -105,6 +110,7 @@ export function PackageActions({ packageId, isActive, isOffer = false, isFeature
 
     await supabase.from("packages").delete().eq("id", packageId);
 
+    await revalidatePackages();
     setDeleteOpen(false);
     router.refresh();
     setLoading(false);

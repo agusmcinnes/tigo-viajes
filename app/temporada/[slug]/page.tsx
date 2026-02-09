@@ -1,19 +1,18 @@
 import { notFound } from "next/navigation";
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { SpecialPageContent } from "../special-page-content";
-import { getSectionBySlug } from "@/lib/services/sections";
-import { getSpecialPackages } from "@/lib/services/packages";
+import { getCachedSectionBySlug, getCachedSpecialPackages } from "@/lib/cache";
 import { TravelPackage } from "@/components/package-card";
 
 async function getPageData(slug: string) {
   try {
-    const section = await getSectionBySlug(slug);
+    const section = await getCachedSectionBySlug(slug);
 
     if (!section) return null;
 
-    const packages = await getSpecialPackages(section.slug);
+    const packages = await getCachedSpecialPackages(section.slug);
 
     return {
       section: {
@@ -43,7 +42,7 @@ export default async function TemporadaSlugPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <Header variant="transparent" />
+      <HeaderWrapper variant="transparent" />
       <main>
         <SpecialPageContent section={data.section} packages={data.packages} />
       </main>
