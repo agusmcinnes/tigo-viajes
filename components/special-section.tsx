@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -138,16 +139,14 @@ export function SpecialSection({ section, features }: SpecialSectionProps) {
 
   return (
     <section className="py-20 relative overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('${backgroundImage}')`,
-        }}
-      >
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/60" />
-      </div>
+      <Image
+        src={backgroundImage}
+        alt={sectionData.title || "Seccion especial"}
+        fill
+        sizes="100vw"
+        className="object-cover -z-10"
+      />
+      <div className="absolute inset-0 bg-black/60" />
 
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10">

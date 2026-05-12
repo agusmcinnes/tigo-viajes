@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -36,14 +37,21 @@ export function PackageDetailContent({
     <>
       {/* Hero Image - Fullwidth */}
       <section className="relative h-[45vh] min-h-[350px] max-h-[500px] overflow-hidden">
-        {/* Background Image */}
         <motion.div
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${pkg.imageUrl}')` }}
-        />
+          className="absolute inset-0"
+        >
+          <Image
+            src={pkg.imageUrl}
+            alt={pkg.name}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </motion.div>
 
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/50" />

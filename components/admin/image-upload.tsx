@@ -1,10 +1,19 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import imageCompression from "browser-image-compression";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Loader2, ImageIcon, AlertCircle } from "lucide-react";
+
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 0.4,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true,
+  fileType: "image/webp" as const,
+  initialQuality: 0.8,
+};
 
 type BucketType = "packages" | "sections" | "destinations";
 
@@ -55,18 +64,18 @@ export function ImageUpload({
     setError(null);
 
     try {
+      const compressedFile = await imageCompression(file, COMPRESSION_OPTIONS);
+
       const supabase = createClient();
 
-      // Generar nombre unico
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.webp`;
 
-      // Subir archivo
       const { data, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(fileName, file, {
-          cacheControl: "3600",
+        .upload(fileName, compressedFile, {
+          cacheControl: "31536000",
           upsert: false,
+          contentType: "image/webp",
         });
 
       if (uploadError) {
@@ -200,7 +209,7 @@ export function ImageUpload({
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
-                JPG, PNG o WebP. Maximo 5MB.
+                JPG, PNG o WebP. Maximo 5MB. Se optimiza automaticamente.
               </p>
             </div>
           )}

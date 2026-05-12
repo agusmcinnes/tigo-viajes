@@ -263,11 +263,12 @@ export function Header({
                               className="flex gap-3 p-3 rounded-xl hover:bg-primary/5 transition-colors cursor-pointer group/item"
                             >
                               <div className="relative w-20 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <div
-                                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/item:scale-110"
-                                  style={{
-                                    backgroundImage: `url('${dest.image}')`,
-                                  }}
+                                <Image
+                                  src={dest.image}
+                                  alt={dest.name}
+                                  fill
+                                  sizes="80px"
+                                  className="object-cover transition-transform duration-500 group-hover/item:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                               </div>
@@ -415,12 +416,15 @@ export function Header({
                                     className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/5 transition-colors"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                   >
-                                    <div
-                                      className="w-10 h-10 rounded-lg bg-cover bg-center flex-shrink-0"
-                                      style={{
-                                        backgroundImage: `url('${dest.image}')`,
-                                      }}
-                                    />
+                                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                                      <Image
+                                        src={dest.image}
+                                        alt={dest.name}
+                                        fill
+                                        sizes="40px"
+                                        className="object-cover"
+                                      />
+                                    </div>
                                     <div className="flex-1">
                                       <span className="text-sm font-medium text-foreground">
                                         {dest.name}

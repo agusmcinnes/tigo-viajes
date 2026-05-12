@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Calendar, Users, Clock, MapPin, ArrowRight } from "lucide-react";
@@ -48,9 +49,12 @@ export function PackageCard({ package: pkg, index = 0 }: PackageCardProps) {
       <Card className="h-full overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 group p-0">
         {/* Image Container */}
         <div className="relative h-56 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-            style={{ backgroundImage: `url('${pkg.imageUrl}')` }}
+          <Image
+            src={pkg.imageUrl}
+            alt={pkg.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -118,14 +119,21 @@ export function SpecialPageContent({ section, packages }: SpecialPageContentProp
     <>
       {/* Hero Section - Fullwidth */}
       <section className="relative h-[85vh] min-h-[600px] max-h-[800px] overflow-hidden">
-        {/* Background Image */}
         <motion.div
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.2 }}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${backgroundImage}')` }}
-        />
+          className="absolute inset-0"
+        >
+          <Image
+            src={backgroundImage}
+            alt={section.title || "Temporada"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </motion.div>
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />

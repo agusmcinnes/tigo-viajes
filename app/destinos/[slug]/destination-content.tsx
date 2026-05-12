@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { MapPin, ArrowLeft, MessageCircle, Sparkles } from "lucide-react";
@@ -31,14 +32,21 @@ export function DestinationPageContent({
     <>
       {/* Hero Section - Fullwidth */}
       <section className="relative h-[50vh] min-h-[400px] max-h-[550px] overflow-hidden">
-        {/* Background Image */}
         <motion.div
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${destination.heroImage}')` }}
-        />
+          className="absolute inset-0"
+        >
+          <Image
+            src={destination.heroImage}
+            alt={destination.name}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </motion.div>
 
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/50" />
